@@ -1,25 +1,23 @@
-import logo from './logo.svg';
-import './App.css';
+import Background from "./conponents/Background";
+import { pageAtom } from "./conponents/Header";
+import Layers from "./conponents/Layers";
+import UI from "./conponents/UI";
+import { useRecoilValue } from 'recoil';
+import Join from "./conponents/Join";
+import About from "./conponents/About";
+import Home from "./conponents/Home";
 
-function App() {
+export default function App() {
+  const page = useRecoilValue(pageAtom);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+        {page.page === 'join' && <Join />}
+        {page.page === 'about' && <About />}
+        {page.page === 'home' && <Home />}
+        {page.page === 'performance' && <Layers />}
+        {page.page === 'performance' && <Background />}
+        <UI />
     </div>
   );
 }
-
-export default App;
