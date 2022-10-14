@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { pageAtom } from "./Header";
 import { useRecoilState } from 'recoil';
+import { useState } from "react";
 
 export const Centered = styled.div`
     position: absolute;
@@ -23,6 +24,10 @@ export const M = styled.span`
         background-color: unset;
         color: unset;
     `};
+    ${props => props.selected && `
+        outline: 1px solid white;
+        outline-offset: 5px;
+    `};
     `;
 
 const JoinButton = styled.div`
@@ -42,6 +47,8 @@ const JoinButton = styled.div`
 
 export default function Join(props) {
     const [page, setpage] = useRecoilState(pageAtom);
+    const [answers, setanswers] = useState({ 1: null, 2: null, 3: null, 4: null })
+
 
     if (page.subpage === 1) return (
         <Centered>
@@ -50,9 +57,9 @@ export default function Join(props) {
                 <p>We believe that anyone is a performer and everyone is welcome to join our archive. We will invite you for a short cooking & filming session (or come to you).</p>
                 <p>First, we have 4 questions that will help us define your performer profile.</p>
             </div>
-            <div style={{display:'flex', justifyContent:'space-between'}}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div></div>
-                <JoinButton onClick={() => setpage({page:'join', subpage:2})}>Next</JoinButton>
+                <JoinButton onClick={() => setpage({ page: 'join', subpage: 2 })}>Next</JoinButton>
             </div>
         </Centered>
     )
@@ -61,15 +68,13 @@ export default function Join(props) {
         <Centered>
             <div>
                 <p>1. How often do you make couscous?</p>
-                <p><M button>Never</M></p>
-                <p><M button>Rarely</M></p>
-                <p><M button>For Special occasions and holidays</M></p>
-                <p><M button>Once a Month</M></p>
-                <p><M button>Once a Week</M></p>
+                <Selection
+                    options={['Never', 'Rarely', 'For Special occasions and holidays', 'Once a Month', 'Once a Week']}
+                    selected={answers[1]} onChange={(i) => setanswers({ ...answers, 1: i })} />
             </div>
-            <div style={{display:'flex', justifyContent:'space-between'}}>
-                <JoinButton inversed onClick={() => setpage({page:'join', subpage:1})}>Back</JoinButton>
-                <JoinButton onClick={() => setpage({page:'join', subpage:3})}>Next</JoinButton>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <JoinButton inversed onClick={() => setpage({ page: 'join', subpage: 1 })}>Back</JoinButton>
+                <JoinButton onClick={() => setpage({ page: 'join', subpage: 3 })}>Next</JoinButton>
             </div>
         </Centered>
     )
@@ -78,13 +83,13 @@ export default function Join(props) {
         <Centered>
             <div>
                 <p>2. Does couscous making run in your family?</p>
-                <p><M button>1st generation (starts with me)</M></p>
-                <p><M button>2nd generation (parents)</M></p>
-                <p><M button>3rd generation + (grandparents and back)</M></p>
+                <Selection
+                    options={['1st generation (starts with me)','2nd generation (parents)','3rd generation + (grandparents and back)']}
+                    selected={answers[2]} onChange={(i) => setanswers({ ...answers, 2: i })} />
             </div>
-            <div style={{display:'flex', justifyContent:'space-between'}}>
-                <JoinButton inversed onClick={() => setpage({page:'join', subpage:2})}>Back</JoinButton>
-                <JoinButton onClick={() => setpage({page:'join', subpage:4})}>Next</JoinButton>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <JoinButton inversed onClick={() => setpage({ page: 'join', subpage: 2 })}>Back</JoinButton>
+                <JoinButton onClick={() => setpage({ page: 'join', subpage: 4 })}>Next</JoinButton>
             </div>
         </Centered>
     )
@@ -93,17 +98,16 @@ export default function Join(props) {
         <Centered>
             <div>
                 <p>3. Where does your recipe originate from?</p>
-                <p><M button>Morocco</M></p>
-                <p><M button>Algeria</M></p>
-                <p><M button>Tunisia</M></p>
-                <p><M button>Other (Dropdown)</M></p>
-                <br/>
+                <Selection
+                    options={['Morocco','Algeria','Tunisia','Other']}
+                    selected={answers[3]} onChange={(i) => setanswers({ ...answers, 3: i })} />
+                <br />
                 <p>4. Where are you living and making couscous at the moment?</p>
                 <p><M button>DropDown</M></p>
             </div>
-            <div style={{display:'flex', justifyContent:'space-between'}}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <p>Thank you for your answers. We will get back to you soon.</p>
-                <JoinButton onClick={() => setpage({page:'join', subpage:5})}>join</JoinButton>
+                <JoinButton onClick={() => setpage({ page: 'join', subpage: 5 })}>join</JoinButton>
             </div>
         </Centered>
     )
@@ -113,14 +117,27 @@ export default function Join(props) {
             <div>
                 <p>Thank you for joining us!</p>
                 <p>We will contact you in the next few days.</p>
-                <br/>
-                <p>We invite you to browse through the <M button onClick={()=>setpage({page:'home'})}>PERFORMERS</M> in the archive.</p>
+                <br />
+                <p>We invite you to browse through the <M button onClick={() => setpage({ page: 'home' })}>PERFORMERS</M> in the archive.</p>
             </div>
-            <div style={{display:'flex', justifyContent:'center'}}>
-                <JoinButton onClick={() => setpage({page:'home'})}>Good</JoinButton>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <JoinButton onClick={() => setpage({ page: 'home' })}>Good</JoinButton>
             </div>
         </Centered>
     )
 
     return null
+}
+
+
+
+function Selection(props) {
+    return (
+        <>
+            {props.options.map((option, i) => (
+                <p><M button selected={props.selected === i} onClick={() => props.onChange(i)}>{option}</M></p>
+            ))}
+        </>
+
+    )
 }
