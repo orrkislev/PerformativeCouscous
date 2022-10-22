@@ -38,7 +38,7 @@ export default function Floating(props) {
         function handleMouseMove(e) {
             if (drag) {
                 setPos({ x: e.pageX - offset.x, y: e.pageY - offset.y });
-                props.onDrag()
+                // props.onDrag()
             }
         }
 

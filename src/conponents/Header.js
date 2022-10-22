@@ -3,7 +3,7 @@ import { UIRow, ToggleButton, HeaderElement } from "./UIElements";
 import { useRecoilState, useRecoilValue, atom } from 'recoil';
 import { useEffect } from "react";
 import { M } from "./Join";
-import { performanceAtom } from "./Performance";
+import { performanceAtom } from "./Layers";
 
 export const pageAtom = new atom({
     key: 'page', default: {
@@ -34,7 +34,7 @@ function HeaderLeft(props) {
             <div>PERFORMERS</div>
             {performance && (
                 <>
-                /<HeaderElement active={page.page === 'performance'} onClick={() => setpage({ page: 'performance'})}>{performance.title}</HeaderElement >
+                /<HeaderElement active={page.page === 'performance'} onClick={() => setpage({ page: 'performance'})}>{performance.name}</HeaderElement >
                 </>
             )}
         </div>

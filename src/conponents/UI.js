@@ -1,6 +1,6 @@
 import { atom, useRecoilState, useRecoilValue } from 'recoil';
 import Header, { pageAtom } from './Header';
-import { layersData } from './Layers';
+import { layersPerfs } from './Layers';
 import { SideBarButton, UIContainer } from './UIElements';
 
 export const uiStateAtom = new atom({
@@ -26,7 +26,7 @@ function SideBarPerformance(props) {
 
     return (
         <>
-            {layersData.map((layer, i) => {
+            {layersPerfs.map((layer, i) => {
                 return (
                     <SideBarButton key={i} 
                         text={layer.text} 
