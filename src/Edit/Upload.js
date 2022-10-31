@@ -5,6 +5,7 @@ import { FileUploader } from "react-drag-drop-files";
 import { useState } from 'react';
 import { uploadBytesResumable } from "firebase/storage";
 import FrontUpload from './FrontUpload';
+import TopUpload from './TopUpload';
 
 export default function Upload() {
     const [user, error, loading] = useAuthState(auth);
@@ -17,6 +18,7 @@ export default function Upload() {
             <h1>Hi {user.displayName}</h1>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
             <FrontUpload name={name} />
+            <TopUpload name={name} />
         </div>
     )
 }

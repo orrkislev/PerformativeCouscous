@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useRecoilValue, useRecoilState, atom } from 'recoil';
 import Floating from './Floating';
+import Gesture from './layers/Gesture';
 import Pose from './layers/Pose';
 import Rhythm from './layers/Rhythm';
+import StateOfMind from './layers/StateOfMind';
 import { uiStateAtom } from './UI';
 
 export const layersDataAtom = atom({ key: 'layersData', default: { time: 0, reset: 0 } });
@@ -10,10 +12,10 @@ export const performanceAtom = new atom({ key: 'performance', default: {} });
 
 
 export const layersPerfs = [
-    { name: 'gestures', colors: ['purple', 'white'], text: 'Gesture', component: (<></>) },
+    { name: 'gestures', colors: ['purple', 'white'], text: 'Gesture', component: (<Gesture />) },
     { name: 'pose', colors: ['red', 'white'], text: 'Pose', component: (<Pose />) },
     { name: 'rhythm', colors: ['blue', 'white'], text: 'Rhythm', component: (<Rhythm />) },
-    { name: 'mind', colors: ['yellow', 'black'], text: 'State of Mind', component: (<></>) },
+    { name: 'mind', colors: ['yellow', 'black'], text: 'State of Mind', component: (<StateOfMind />) },
     { name: 'tools', colors: ['green', 'black'], text: 'Tools', component: (<></>) },
     { name: 'mix', colors: ['white', 'black'], text: 'Mix & Match', component: (<></>) },
 ]

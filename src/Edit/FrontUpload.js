@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { FileUploader } from "react-drag-drop-files";
 import * as faceapi from 'face-api.js';
 import { UploadFile } from "./Upload";
+import { getPath } from "./TopUpload";
 
 export default function FrontUpload(props) {
 
@@ -116,20 +117,7 @@ export default function FrontUpload(props) {
 export function PoseVis(props) {
     if (!props.data) return null;
 
-    let paths = null;
-    const drawPos = props.data.map((pos, i) => {
-        return {
-            x: pos.x * props.height + props.height,
-            y: pos.y * props.height
-        }
-    })
-    paths = [
-        [11, 12, 23, 24, 11].map(i => `${drawPos[i].x},${drawPos[i].y}`).join(' '),
-        [11, 13, 15, 17, 19, 15].map(i => `${drawPos[i].x},${drawPos[i].y}`).join(' '),
-        [12, 14, 16, 18, 20, 16].map(i => `${drawPos[i].x},${drawPos[i].y}`).join(' '),
-        [23, 25, 27, 29, 31, 27].map(i => `${drawPos[i].x},${drawPos[i].y}`).join(' '),
-        [24, 26, 28, 30, 32, 28].map(i => `${drawPos[i].x},${drawPos[i].y}`).join(' '),
-    ]
+    let paths = getBodyPaths(props.data, props.height);
 
     return (
         <svg width={`${props.height * 2}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height * 2} ${props.height}`} >
@@ -138,6 +126,21 @@ export function PoseVis(props) {
             ))}
         </svg>
     )
+}
+function getBodyPaths(data, height) {
+    const newData = data.map(pos => {
+        return {
+            x: (pos.x + 1) * height,
+            y: pos.y * height
+        }
+    })
+    return [
+        getPath(newData, [11, 12, 23, 24, 11]),
+        getPath(newData, [11, 13, 15, 17, 19, 15]),
+        getPath(newData, [12, 14, 16, 18, 20, 16]),
+        getPath(newData, [23, 25, 27, 29, 31, 27]),
+        getPath(newData, [24, 26, 28, 30, 32, 28]),
+    ]
 }
 
 
