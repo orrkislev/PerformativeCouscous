@@ -2,23 +2,26 @@ import { Holistic } from "@mediapipe/holistic";
 import { useRef, useState } from 'react';
 import { FileUploader } from "react-drag-drop-files";
 import * as faceapi from 'face-api.js';
-import { UploadFile } from "./Upload";
-import { getPath } from "./TopUpload";
+import { UploadFile } from "./file";
+import { DataContainer, getPath } from "./Data";
+import { PoseVis } from "../conponents/layers/Pose";
+import { MindVis } from "../conponents/layers/StateOfMind";
 
 export default function FrontUpload(props) {
-
     const [file, setFile] = useState(null);
-    const [poseData, setPoseData] = useState(null);
-    const allData = useRef([]);
     const vidRef = useRef(null);
     const [ready, setReady] = useState(false);
-    const [expression, setExpression] = useState('');
-    const allExpressionData = useRef([]);
 
+    const allPoseData = useRef(new DataContainer());
+    const allExpressionData = useRef(new DataContainer());
 
-    const onResults = (results) => {
+    const [poseData, setPoseData] = useState(null);
+    const [expressionData, setExpressionData] = useState(null);
+
+    const onPoseResult = (results) => {
+        let positions = null
         if (results.poseLandmarks) {
-            const positions = results.poseLandmarks.map(landmark => {
+            positions = results.poseLandmarks.map(landmark => {
                 return { x: landmark.x * vidRef.current.videoWidth, y: landmark.y * vidRef.current.videoHeight }
             })
             const bottom = positions.reduce((a, b) => a.y < b.y ? a : b).y;
@@ -30,12 +33,9 @@ export default function FrontUpload(props) {
                 pos.x *= scale;
                 pos.y *= scale;
             });
-            setPoseData(positions);
-            allData.current.push({ time: vidRef.current.currentTime, data: positions });
-        } else {
-            allData.current.push({ time: vidRef.current.currentTime, data: null });
-            setPoseData(null)
         }
+        allPoseData.current.insert(positions, vidRef.current.currentTime);
+        setPoseData(positions)
     };
 
     const selectFile = (videoFile) => {
@@ -45,61 +45,66 @@ export default function FrontUpload(props) {
 
         const holi = new Holistic({ locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}` });
         const faceExpression = new FaceExpressions()
+        holi.onResults(onPoseResult);
+        let isFirstFrame = true;
 
-        holi.onResults(onResults);
-        let poseDataGetter, expressionDataGetter;
-
-        const updateCanvas = async () => {
-            if (!ready) {
-                await holi.send({ image: video })
-                const expressions = await faceExpression.predict(video)
-                if (expressions) {
-                    setExpression(expressions)
-                    allExpressionData.current.push({ time: video.currentTime, data: expressions })
-                } else {
-                    allExpressionData.current.push({ time: video.currentTime, data: null })
-                }
-            } else {
-                setPoseData(poseDataGetter.getDataforTime(video.currentTime));
-                setExpression(expressionDataGetter.getDataforTime(video.currentTime));
+        const nextFrameCalc = async () => {
+            if (isFirstFrame) {
+                props.updateDuration(video.duration)
+                isFirstFrame = false;
             }
+
+            await holi.send({ image: video })
+            const newExpressions = await faceExpression.predict(video)
+            allExpressionData.current.insert(newExpressions, vidRef.current.currentTime)
+            setExpressionData(newExpressions)
 
             video.currentTime += 1 / 20;
             if (video.currentTime >= video.duration) {
                 video.currentTime = 0;
-                if (!ready) {
-                    setReady(true);
-                    holi.close();
-                    poseDataGetter = new DataTimer(allData.current);
-                    expressionDataGetter = new DataTimer(allExpressionData.current);
-                } else {
-                    poseDataGetter.reset()
-                    expressionDataGetter.reset()
-                }
-            }
-            video.requestVideoFrameCallback(updateCanvas);
+                setReady(true);
+                holi.close();
+                allPoseData.current.fillGaps();
+                Pose_calcStuff(allPoseData.current)
+                console.log(allPoseData.current.data)
+                allExpressionData.current.fillGaps();
+                video.requestVideoFrameCallback(nextFrameDisplay);
+            } else video.requestVideoFrameCallback(nextFrameCalc);
         }
-        video.requestVideoFrameCallback(updateCanvas);
+
+        const nextFrameDisplay = () => {
+            allPoseData.current.setTime(vidRef.current?.currentTime)
+            allExpressionData.current.setTime(vidRef.current?.currentTime)
+            setPoseData(allPoseData.current.get())
+            setExpressionData(allExpressionData.current.get())
+
+            video.currentTime += 1 / 20;
+            if (video.currentTime >= video.duration) {
+                video.currentTime = 0;
+            }
+            video.requestVideoFrameCallback(nextFrameDisplay);
+        }
+
+        video.requestVideoFrameCallback(nextFrameCalc);
     };
-
-
-    const strongestExpression = expression ? expression[Object.keys(expression).reduce((a, b) => expression[a].probability > expression[b].probability ? a : b)].expression : null
 
     return (
         <div>
-            <video ref={vidRef} height='150px' />
-            {!file && <FileUploader handleChange={selectFile} name="file" />}
-            <PoseVis data={poseData} height={150} />
-            {strongestExpression && <div>{strongestExpression}</div>}
+            <div style={{ display: 'flex' }}>
+                <video ref={vidRef} height={file ? '150px' : '0px'} />
+                {!file && <FileUploader handleChange={selectFile} name="file" />}
+                <PoseVis data={poseData} height={150} />
+                {expressionData && <MindVis focus={expressionData[0].focus} height={150} />}
+            </div>
 
             {ready && (
                 <div>
-                    <UploadFile name={`${props.name}-front`} 
+                    <UploadFile name={`${props.name}-front`}
                         file={file} />
                     <UploadFile name={`${props.name}-pose`}
-                        file={new Blob([JSON.stringify(allData.current)], { type: "application/json" })} />
+                        file={new Blob([JSON.stringify(allPoseData.current.data)], { type: "application/json" })} />
                     <UploadFile name={`${props.name}-expression`}
-                        file={new Blob([JSON.stringify(allExpressionData.current)], { type: "application/json" })} />
+                        file={new Blob([JSON.stringify(allExpressionData.current.data)], { type: "application/json" })} />
                 </div>
             )}
         </div>
@@ -111,58 +116,30 @@ export default function FrontUpload(props) {
 
 
 
-
-
-
-export function PoseVis(props) {
-    if (!props.data) return null;
-
-    let paths = getBodyPaths(props.data, props.height);
-
-    return (
-        <svg width={`${props.height * 2}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height * 2} ${props.height}`} >
-            {paths.map((path, i) => (
-                <polyline key={i} points={path} stroke="white" fill="blue" />
-            ))}
-        </svg>
-    )
-}
-function getBodyPaths(data, height) {
-    const newData = data.map(pos => {
-        return {
-            x: (pos.x + 1) * height,
-            y: pos.y * height
+function Pose_calcStuff(poseData) {
+    const poseStuffData = new DataContainer();
+    console.log(poseData.data.length)
+    for (let i = 1; i < poseData.data.length; i++) {
+        const d1 = poseData.data[i - 1].data
+        const d2 = poseData.data[i].data
+        if (!d1 || !d2) {
+            poseStuffData.insert(null, i)
+        } else {
+            const arm1Movemenet = dist(d1[12], d1[14]) - dist(d2[12], d2[14]) + dist(d1[14], d1[16]) - dist(d2[14], d2[16])
+            const arm2Movemenet = dist(d1[11], d1[13]) - dist(d2[11], d2[13]) + dist(d1[13], d1[15]) - dist(d2[13], d2[15])
+            const leg1Movemenet = dist(d1[23], d1[25]) - dist(d2[23], d2[25]) + dist(d1[25], d1[27]) - dist(d2[25], d2[27])
+            const leg2Movemenet = dist(d1[24], d1[26]) - dist(d2[24], d2[26]) + dist(d1[26], d1[28]) - dist(d2[26], d2[28])
+            poseStuffData.insert([arm1Movemenet, arm2Movemenet, leg1Movemenet, leg2Movemenet], i)
         }
-    })
-    return [
-        getPath(newData, [11, 12, 23, 24, 11]),
-        getPath(newData, [11, 13, 15, 17, 19, 15]),
-        getPath(newData, [12, 14, 16, 18, 20, 16]),
-        getPath(newData, [23, 25, 27, 29, 31, 27]),
-        getPath(newData, [24, 26, 28, 30, 32, 28]),
-    ]
+    }
+    poseStuffData.fillGaps()
+    poseStuffData.lowPassFilter()
+    for (let i = 0; i < poseStuffData.data.length; i++) {
+        if (poseStuffData.data[i].data) poseData.data[i].data.push(...poseStuffData.data[i].data)
+    }
 }
-
-
-
-
-
-
-export class DataTimer {
-    constructor(data) {
-        this.data = data;
-        this.index = 1;
-    }
-    getDataforTime(time) {
-        while (this.index < this.data.length && this.data[this.index].time < time) {
-            this.index++;
-        }
-        if (this.index >= this.data.length) this.index = 1;
-        return this.data[this.index - 1].data;
-    }
-    reset() {
-        this.index = 1;
-    }
+function dist(a, b) {
+    return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2)
 }
 
 
@@ -171,6 +148,7 @@ export class DataTimer {
 
 
 
+// ['angry', 'disgusted', 'fearful', 'happy', 'sad', 'surprised', 'neutral']
 class FaceExpressions {
     constructor() {
         faceapi.loadSsdMobilenetv1Model('/models')
@@ -179,11 +157,10 @@ class FaceExpressions {
     async predict(video) {
         if (video.readyState <= 2) return;
         const detections = await faceapi.detectSingleFace(video).withFaceExpressions()
-        if (detections) {
-            return ['angry', 'disgusted', 'fearful', 'happy', 'sad', 'surprised', 'neutral'].map(exp => ({
-                expression: exp,
-                probability: detections.expressions[exp]
-            }))
+        if (detections?.expressions) {
+            detections.expressions.focus = detections.expressions.sad + detections.expressions.neutral
+            detections.expressions.satisfaction = detections.expressions.happy + detections.expressions.surprised
+            return [{ ...detections.expressions }];
         }
         return null
     }

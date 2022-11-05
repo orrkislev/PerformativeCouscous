@@ -16,8 +16,8 @@ export const layersPerfs = [
     { name: 'pose', colors: ['red', 'white'], text: 'Pose', component: (<Pose />) },
     { name: 'rhythm', colors: ['blue', 'white'], text: 'Rhythm', component: (<Rhythm />) },
     { name: 'mind', colors: ['yellow', 'black'], text: 'State of Mind', component: (<StateOfMind />) },
-    { name: 'tools', colors: ['green', 'black'], text: 'Tools', component: (<></>) },
-    { name: 'mix', colors: ['white', 'black'], text: 'Mix & Match', component: (<></>) },
+    { name: 'tools', colors: ['green', 'black'], text: 'Timeline & Tools', component: (<></>) },
+    { name: 'empty', colors: ['black', 'black'], text: '', component: (<></>) },
 ]
 
 export default function Layers(props) {
