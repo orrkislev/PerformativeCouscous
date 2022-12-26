@@ -48,7 +48,7 @@ export default function StateOfMind(props) {
     const expressions = frameData[0]
 
     return (
-        <MindVis satisfaction={satisfactionData} focus={expressions.focus} />
+        <MindVis satisfaction={satisfactionData} focus={expressions.focus} height={150}/>
     )
 }
 
@@ -57,32 +57,43 @@ export default function StateOfMind(props) {
 export function MindVis(props) {
 
     let path = null
-    if (props.satisfaction)
-        path = props.satisfaction.map((d, i) => {
-            const x = i * 10;
-            const y = 15 + d * 10;
-            return `${i === 0 ? `M ${x} ${y}` : `T ${x} ${y}`}`
-        }).join(' ');
+    // if (props.satisfaction)
+    //     path = props.satisfaction.map((d, i) => {
+    //         const x = i * 10;
+    //         const y = 15 + d * 10;
+    //         return `${i === 0 ? `M ${x} ${y}` : `T ${x} ${y}`}`
+    //     }).join(' ');
+
+    const satisfaction = props.satisfaction[props.satisfaction.length - 1] ?? 0
+    const satisfactionNum = Math.round(satisfaction * 20)
+    const satisfactionDashArray = `${satisfactionNum},${20 - satisfactionNum}`
+
+    const focus = props.focus ?? 0
 
     return (
         <StateOfMindContainer>
-            {path && (
-                <div>
-                    satisfaction:
-                    <svg width="100%" height="100%" viewBox="0 0 100 50">
-                        <path d={path} stroke="yellow" fill="none" />
-                    </svg>
-                </div>
-            )}
-            {props.focus && (
-                <div>
-                    focus:
-                    <svg width={`${props.height * 2}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height * 2} ${props.height}`}>
+            <svg width={`150px`} height={`150px`} viewBox={`0 0 150 150`}>
+                <circle cx={75} cy={75} r={50} stroke='yellow' fill="#FFFF0088" stroke-dasharray={satisfactionDashArray} stroke-linecap="round" stroke-width="6"/>
+                <circle cx={75} cy={75} r={45 * props.focus} fill='yellow'  stroke-width="4"/>
+            </svg> 
+
+            {/* {path && ( */}
+                {/*  <div> */}
+                    {/* satisfaction: */}
+                    {/* <svg width="100%" height="100%" viewBox="0 0 100 50"> */}
+                        {/* <path d={path} stroke="yellow" fill="none" /> */}
+                    {/* </svg> */}
+                {/* </div> */}
+            {/* )} */}
+            {/* {props.focus && ( */}
+                {/* <div> */}
+                    {/* focus: */}
+                    {/* <svg width={`${props.height * 2}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height * 2} ${props.height}`}>
                         <circle cx={100} cy={100} r={props.height * .2} stroke='yellow' fill="#FFFF0088" />
-                        <circle cx={100} cy={100} r={props.height * .18 * props.focus} fill='yellow' />
-                    </svg>
-                </div>
-            )}
+                        {props.focus && <circle cx={100} cy={100} r={props.height * .18 * props.focus} fill='yellow' />}
+                    </svg> */}
+                {/* </div> */}
+            {/* )} */}
         </StateOfMindContainer>
     )
 }

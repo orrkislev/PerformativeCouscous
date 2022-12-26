@@ -12,20 +12,17 @@ export class DataContainer {
         this.index = 1;
     }
     setTime(time) {
-        if (this.data.length === 0) return;
-        if (time < this.data[0].time) {
-            this.index = 0;
-            return;
-        }
-        if (time > this.data[this.data.length - 1].time) {
-            this.index = this.data.length - 1;
-            return;
-        }
-        while (this.index < this.data.length - 1 && this.data[this.index].time < time) {
-            this.index++;
-        }
-        while (this.index > 0 && this.data[this.index].time > time) {
-            this.index--;
+        if (this.data.length === 0) return this
+        
+        if (time < this.data[0].time) this.index = 0;
+        else if (time > this.data[this.data.length - 1].time) this.index = this.data.length - 1
+        else {
+            while (this.index < this.data.length - 1 && this.data[this.index].time < time) {
+                this.index++;
+            }
+            while (this.index > 0 && this.data[this.index].time > time) {
+                this.index--;
+            }
         }
         return this
     }

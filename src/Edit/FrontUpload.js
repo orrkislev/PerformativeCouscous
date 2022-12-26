@@ -39,6 +39,7 @@ export default function FrontUpload(props) {
     };
 
     const selectFile = (videoFile) => {
+        props.updateFile(URL.createObjectURL(videoFile));
         setFile(videoFile)
         const video = vidRef.current;
         video.src = URL.createObjectURL(videoFile);
@@ -46,14 +47,8 @@ export default function FrontUpload(props) {
         const holi = new Holistic({ locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}` });
         const faceExpression = new FaceExpressions()
         holi.onResults(onPoseResult);
-        let isFirstFrame = true;
 
         const nextFrameCalc = async () => {
-            if (isFirstFrame) {
-                props.updateDuration(video.duration)
-                isFirstFrame = false;
-            }
-
             await holi.send({ image: video })
             const newExpressions = await faceExpression.predict(video)
             allExpressionData.current.insert(newExpressions, vidRef.current.currentTime)
@@ -66,7 +61,6 @@ export default function FrontUpload(props) {
                 holi.close();
                 allPoseData.current.fillGaps();
                 Pose_calcStuff(allPoseData.current)
-                console.log(allPoseData.current.data)
                 allExpressionData.current.fillGaps();
                 video.requestVideoFrameCallback(nextFrameDisplay);
             } else video.requestVideoFrameCallback(nextFrameCalc);
@@ -92,7 +86,7 @@ export default function FrontUpload(props) {
         <div>
             <div style={{ display: 'flex' }}>
                 <video ref={vidRef} height={file ? '150px' : '0px'} />
-                {!file && <FileUploader handleChange={selectFile} name="file" />}
+                {!file && <FileUploader handleChange={selectFile} name="file" label="סרטון מהמצלמה מקדימה"/>}
                 <PoseVis data={poseData} height={150} />
                 {expressionData && <MindVis focus={expressionData[0].focus} height={150} />}
             </div>
@@ -118,7 +112,6 @@ export default function FrontUpload(props) {
 
 function Pose_calcStuff(poseData) {
     const poseStuffData = new DataContainer();
-    console.log(poseData.data.length)
     for (let i = 1; i < poseData.data.length; i++) {
         const d1 = poseData.data[i - 1].data
         const d2 = poseData.data[i].data

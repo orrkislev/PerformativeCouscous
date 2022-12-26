@@ -5,6 +5,7 @@ import Gesture from './layers/Gesture';
 import Pose from './layers/Pose';
 import Rhythm from './layers/Rhythm';
 import StateOfMind from './layers/StateOfMind';
+import Timeline from './layers/TimeLine';
 import { uiStateAtom } from './UI';
 
 export const layersDataAtom = atom({ key: 'layersData', default: { time: 0, reset: 0 } });
@@ -16,7 +17,7 @@ export const layersPerfs = [
     { name: 'pose', colors: ['red', 'white'], text: 'Pose', component: (<Pose />) },
     { name: 'rhythm', colors: ['blue', 'white'], text: 'Rhythm', component: (<Rhythm />) },
     { name: 'mind', colors: ['yellow', 'black'], text: 'State of Mind', component: (<StateOfMind />) },
-    { name: 'tools', colors: ['green', 'black'], text: 'Timeline & Tools', component: (<></>) },
+    { name: 'tools', colors: ['white', 'black'], text: 'Timeline', component: (<Timeline />), notFloating: true },
     { name: 'empty', colors: ['black', 'black'], text: '', component: (<></>) },
 ]
 
@@ -36,6 +37,7 @@ export default function Layers(props) {
     return (
         <div>
             {layersPerfs.map((layer, i) => {
+                if (layer.notFloating && uistate[layer.name]) return layer.component;
                 return (
                     <Floating key={i} colors={layer.colors} title={layer.text} active={uistate[layer.name]} x={100 + i * 100} y={100 + i * 100}>
                         {layer.component}

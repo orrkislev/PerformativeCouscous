@@ -42,15 +42,8 @@ export default function TopUpload(props) {
         });
 
         hands.onResults(onResults);
-        let isFirstFrame = true;
-
 
         const nextFrameCalc = async () => {
-            if (isFirstFrame) {
-                props.updateDuration(video.duration)
-                isFirstFrame = false;
-            }
-
             await hands.send({ image: video })
 
             video.currentTime += 1 / 20;
@@ -76,9 +69,9 @@ export default function TopUpload(props) {
     };
 
     return (
-        <div>
-            <video ref={vidRef} height='150px' />
-            {!file && <FileUploader handleChange={selectFile} name="file" />}
+        <div style={{ display: 'flex' }}>
+            <video ref={vidRef} height={file ? '150px' : '0px'} />
+            {!file && <FileUploader handleChange={selectFile} name="file" label="סרטון מהמצלמה מלמעלה" />}
             <HandsVis data={handsData} height={150} />
 
             {ready && (

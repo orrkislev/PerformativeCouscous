@@ -20,7 +20,7 @@ export default function Pose(props){
 
     if (!data) return <div>...</div>
     
-    return <PoseVis data={data.setTime(layersData.time).get()} height={150}/>
+    return <PoseVis data={data.setTime(layersData.time).get()} height={window.innerHeight * .5} />
 }
 
 
@@ -46,7 +46,7 @@ export function PoseVis(props) {
     }
 
     return (
-        <svg width={`${props.height * 2}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height * 2} ${props.height}`} >
+        <svg width={`${props.height}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height} ${props.height}`} >
             {paths.map((path, i) => (
                 <polyline key={i} points={path} stroke="red" fill="none" />
             ))}
@@ -56,7 +56,7 @@ export function PoseVis(props) {
 }
 function rescalePoint(point, height) {
     return {
-        x: (point.x + 1) * height,
+        x: (point.x+.5) * height,
         y: point.y * height
     }
 }

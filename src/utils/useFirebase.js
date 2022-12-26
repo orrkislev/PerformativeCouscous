@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getStorage, ref } from 'firebase/storage';
-import { getFirestore, doc, collection } from 'firebase/firestore';
+import { getFirestore, doc, collection, setDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -20,3 +20,7 @@ export const firestore = getFirestore(app);
 export const storageRef = (address) => ref(storage, address);
 export const docRef = (collectionName, docName) => doc(firestore, collectionName, docName);
 export const collectionRef = (collectionName) => collection(firestore, collectionName);
+
+export const save =  async (collectionName, docName, data) => {
+    await setDoc(docRef(collectionName, docName), data, { merge: true });
+}
