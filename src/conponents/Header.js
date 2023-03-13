@@ -52,10 +52,10 @@ function HeaderRight(props) {
 
     if (page.page === 'home') return (
         <div>
-            View Gallery By:
+            <span style={{marginRight:'.5em'}}>View Gallery By:</span>
             <M button disabled={page.subpage != 'skill'} onClick={() => setpage({ page: 'home', subpage: 'skill' })}>Skill Level</M> /
             <M button disabled={page.subpage != 'age'} onClick={() => setpage({ page: 'home', subpage: 'age' })}>Age</M> /
-            <M button disabled={page.subpage != 'intensity'} onClick={() => setpage({ page: 'home', subpage: 'intensity' })}>Movement Intensity</M> /
+            <M button disabled={page.subpage != 'intensity'} onClick={() => setpage({ page: 'home', subpage: 'intensity' })}>Movement Intensity</M>
         </div>
     )
 

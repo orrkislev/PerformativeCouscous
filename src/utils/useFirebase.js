@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getStorage, ref } from 'firebase/storage';
-import { getFirestore, doc, collection, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, collection, setDoc, deleteDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -23,4 +23,11 @@ export const collectionRef = (collectionName) => collection(firestore, collectio
 
 export const save =  async (collectionName, docName, data) => {
     await setDoc(docRef(collectionName, docName), data, { merge: true });
+}
+
+export const removeDoc = async (collectionName, docName) => {
+    await deleteDoc(docRef(collectionName, docName));
+}
+export const removeFile = async (address) => {
+    await storageRef(address).delete();
 }

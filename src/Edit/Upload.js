@@ -1,6 +1,6 @@
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Login } from './Login';
-import { auth, collectionRef, getCollection, save } from '../utils/useFirebase';
+import { auth, collectionRef, getCollection, removeDoc, removeFile, save, storageRef } from '../utils/useFirebase';
 import { useEffect, useState } from 'react';
 import FrontUpload from './FrontUpload';
 import TopUpload from './TopUpload';
@@ -10,6 +10,7 @@ import useForm from '../utils/useForm';
 import Rating from '../conponents/Rating';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { SideBarButton } from '../conponents/UIElements';
+import BackUpload from './BackUpload';
 
 const UploadContainer = styled.div`
     display: flex;
@@ -37,7 +38,21 @@ export default function Upload() {
     }
 
     function selectPerformer(performer) {
-        form.setAll(performer);
+        if (!performer) form.reset()
+        else form.setAll(performer);
+    }
+
+    function removePerformer(name) {
+        removeDoc('performers', name)
+        removeFile(`${name}-front`)
+        removeFile(`${name}-pose`)
+        removeFile(`${name}-expression`)
+        removeFile(`${name}-back`)
+        removeFile(`${name}-rhythm`)
+        removeFile(`${name}-top`)
+        removeFile(`${name}-gesture`)
+
+        form.reset()
     }
 
     if (!user) return <Login />
@@ -51,9 +66,16 @@ export default function Upload() {
                         active={performer.name == form.get('name')}
                         text={performer.name}
                         func={() => selectPerformer(performer)}
+                        withClose={performer.name == form.get('name')}
+                        closeFunc={() => removePerformer(performer.name)}
                     />
-                })
-                }
+                })}
+                <SideBarButton key="new_one"
+                    colors={['white', 'black']}
+                    active={false}
+                    text="  +  "
+                    func={() => selectPerformer(null)}
+                />
             </div>
             <div style={{ flex: 7, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <UploadContainer>
@@ -81,6 +103,9 @@ export default function Upload() {
                         </UploadContainer>
                         <UploadContainer>
                             <TopUpload name={form.get('name')} />
+                        </UploadContainer>
+                        <UploadContainer>
+                            <BackUpload name={form.get('name')} />
                         </UploadContainer>
                         <UploadContainer>
                             {file && <TimeLineInput value={form.get('timeline')} name={form.get('name')} file={file} />}

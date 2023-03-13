@@ -55,6 +55,7 @@ export default function StateOfMind(props) {
 
 
 export function MindVis(props) {
+    if (!props.satisfaction) return null;
 
     let path = null
     // if (props.satisfaction)
@@ -73,8 +74,8 @@ export function MindVis(props) {
     return (
         <StateOfMindContainer>
             <svg width={`150px`} height={`150px`} viewBox={`0 0 150 150`}>
-                <circle cx={75} cy={75} r={50} stroke='yellow' fill="#FFFF0088" stroke-dasharray={satisfactionDashArray} stroke-linecap="round" stroke-width="6"/>
-                <circle cx={75} cy={75} r={45 * props.focus} fill='yellow'  stroke-width="4"/>
+                <circle cx={75} cy={75} r={50} stroke='yellow' fill="#FFFF0088" stroke-dasharray={satisfactionDashArray} stroke-linecap="round" stroke-width="4"/>
+                <circle cx={75} cy={75} r={45 * props.focus} fill='yellow'/>
             </svg> 
 
             {/* {path && ( */}

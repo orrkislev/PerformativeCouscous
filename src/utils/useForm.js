@@ -20,9 +20,13 @@ export default function useForm(){
         })
     }
 
+    const reset = () => {
+        setValues({});
+    }
+
     return {
         values, handleChange,
-        get,set,
+        get,set, reset,
         getAll: () => values,
         setAll: (values) => setValues(values)
     };

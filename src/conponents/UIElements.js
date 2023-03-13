@@ -37,6 +37,13 @@ export const SideBarElement = styled.div`
 export function SideBarButton(props) {
     const [hover, setHover] = useState(false);
 
+    let extra = null
+    if (props.withClose) extra = (
+        <div style={{ flex: 1, textAlign: 'right' }}>
+            <span style={{ cursor: 'pointer', color: 'white' }} onClick={props.closeFunc}>X</span>
+        </div>
+    )
+
     return (
         <UIRow>
             <SideBarElement
@@ -50,6 +57,8 @@ export function SideBarButton(props) {
                 {props.text}
 
             </SideBarElement>
+
+            {extra}
         </UIRow>
     );
 }
