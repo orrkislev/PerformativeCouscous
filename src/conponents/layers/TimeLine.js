@@ -23,7 +23,6 @@ export default function Timeline(props) {
     const layersData = useRecoilValue(layersDataAtom);
 
     const perc = layersData.time / performance.duration * 100;
-    console.log(perc)
 
     return (
         <TimelineContainer>

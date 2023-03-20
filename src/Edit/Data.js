@@ -54,6 +54,24 @@ export class DataContainer {
             }
         }
     }
+    resizer(val, newMin, newMax) {
+        let minVal = Infinity;
+        let maxVal = -Infinity;
+        for (let i = 1; i < this.data.length; i++) {
+            if (this.data[i].data) {
+                const d = this.data[i].data[val]
+                if (d < minVal) minVal = d;
+                if (d > maxVal) maxVal = d;
+            }
+        }
+        for (let i = 1; i < this.data.length; i++) {
+            if (this.data[i].data) {
+                const d = this.data[i].data[val]
+                this.data[i].data[val] = newMin + (d - minVal) / (maxVal - minVal) * (newMax - newMin)
+            }
+        }
+    }
+
 }
 
 const lerpGeneral = (a, b, t) => {

@@ -61,6 +61,7 @@ export default function BackUpload(props) {
                 setReady(true);
                 pose.close();
                 allRhythmData.current.fillGaps();
+                allRhythmData.current.resizer('val', -1, 1)
                 video.requestVideoFrameCallback(nextFrameDisplay);
             } else video.requestVideoFrameCallback(nextFrameCalc);
         }
@@ -84,7 +85,7 @@ export default function BackUpload(props) {
             <div style={{ display: 'flex' }}>
                 <video ref={vidRef} height={file ? '150px' : '0px'} />
                 {!file && <FileUploader handleChange={selectFile} name="file" label="סרטון מהמצלמה מאחורה" />}
-                <RhythmVis data={rhythmData} height={150} />
+                <RhythmVis data={rhythmData} height={150} width={150 * 16 / 9}/>
             </div>
 
             {ready && (

@@ -43,10 +43,10 @@ export function PoseVis(props) {
             extra = rescalePoint(extra, props.height)
             extra = <circle cx={extra.x} cy={extra.y} r={5} fill="red" />
         }
-    }
+    }    
 
     return (
-        <svg width={`${props.height}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height} ${props.height}`} >
+        <svg width={`${props.height * .8}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height} ${props.height}`} >
             {paths.map((path, i) => (
                 <polyline key={i} points={path} stroke="red" fill="none" />
             ))}

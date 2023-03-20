@@ -32,12 +32,15 @@ export default function Rhythm(props) {
 
     if (!data) return <div>...</div>
 
+    const width = Math.round(window.innerHeight * .5)
+    const height = width * 9 / 16
+
     return (
         <>
-            <video style={{ width: '100%', height: '100%', objectFit: 'cover' }} ref={vidRef} >
+            <video style={{ width: width + "px", objectFit: 'cover', position:'absolute', zIndex:-1 }} ref={vidRef} >
                 <source src={src} type="video/mp4" />
             </video>
-            <RhythmVis data={data.setTime(layersData.time).get()} height={window.innerHeight * .5} />
+            <RhythmVis data={data.setTime(layersData.time).get()} height={height} width={width} />
         </>
     )
 }
@@ -45,14 +48,16 @@ export default function Rhythm(props) {
 export function RhythmVis(props) {
     if (!props.data) return null;
 
-    const pos = props.data.val < 0 ? props.data.posRight : props.data.posLeft
-    pos.x *= props.height
-    pos.y *= props.height
-    const r = Math.abs(props.data.val) * 300
+    const pos = props.data.val < 0 ? props.data.posLeft : props.data.posRight
+    // console.log(props.data.posRight.y,props.data.posLeft.y)
+    const x = pos.x *  props.height
+    const y = pos.y *  props.height
+    const r = Math.abs(props.data.val) * 100
 
     return (
-        <svg width={`${props.height}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height} ${props.height}`} >
-            <circle cx={pos.x} cy={pos.y} r={r} fill="blue" />
+        <svg width={`${props.width}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height} ${props.height}`} >
+            <circle cx={x} cy={y} r={r} fill="blue" />
+            {/* <circle cx={50} cy={50} r={r} fill="blue" /> */}
         </svg>
     )
 }
