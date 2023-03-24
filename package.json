@@ -7,6 +7,7 @@
     "@mediapipe/holistic": "^0.5.1635989137",
     "@mediapipe/pose": "^0.5.1635988162",
     "@mediapipe/selfie_segmentation": "^0.1.1632777926",
+    "@tensorflow/tfjs": "^4.2.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",

@@ -32,15 +32,12 @@ export default function Rhythm(props) {
 
     if (!data) return <div>...</div>
 
-    const width = Math.round(window.innerHeight * .5)
-    const height = width * 9 / 16
-
     return (
         <>
-            <video style={{ width: width + "px", objectFit: 'cover', position:'absolute', zIndex:-1 }} ref={vidRef} >
+            <video style={{ width: props.size.width + "px", height: props.size.height + "px", objectFit: 'cover', position: 'absolute', zIndex: -1 }} ref={vidRef} >
                 <source src={src} type="video/mp4" />
             </video>
-            <RhythmVis data={data.setTime(layersData.time).get()} height={height} width={width} />
+            <RhythmVis data={data.setTime(layersData.time).get()} width={props.size.width} height={props.size.height} />
         </>
     )
 }
@@ -50,9 +47,9 @@ export function RhythmVis(props) {
 
     const pos = props.data.val < 0 ? props.data.posLeft : props.data.posRight
     // console.log(props.data.posRight.y,props.data.posLeft.y)
-    const x = pos.x *  props.height
-    const y = pos.y *  props.height
-    const r = Math.abs(props.data.val) * 100
+    const x = pos.x * props.height
+    const y = pos.y * props.height
+    const r = Math.abs(props.data.val) * Math.min(props.width, props.height) * 0.2
 
     return (
         <svg width={`${props.width}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height} ${props.height}`} >

@@ -13,12 +13,13 @@ export const performanceAtom = new atom({ key: 'performance', default: {} });
 
 
 export const layersPerfs = [
-    { name: 'gestures', colors: ['purple', 'white'], text: 'Gesture', component: (<Gesture />) },
-    { name: 'pose', colors: ['red', 'white'], text: 'Pose', component: (<Pose />) },
-    { name: 'rhythm', colors: ['blue', 'white'], text: 'Rhythm', component: (<Rhythm />) },
-    { name: 'mind', colors: ['yellow', 'black'], text: 'State of Mind', component: (<StateOfMind />) },
-    { name: 'tools', colors: ['white', 'black'], text: 'Timeline', component: (<Timeline />), notFloating: true },
-    { name: 'empty', colors: ['black', 'black'], text: '', component: (<></>) },
+    { name: 'gestures', colors: ['#ff00ff', 'white'], text: 'GESTURE',       component: Gesture },
+    { name: 'pose',     colors: ['#ff0000', 'white'], text: 'POSE',          component: Pose },
+    { name: 'rhythm',   colors: ['#0000ff', 'white'], text: 'RHYTHM',        component: Rhythm },
+    { name: 'mind',     colors: ['#ffff00', 'black'], text: 'STATE OF MIND', component: StateOfMind },
+    { name: 'tools',    colors: ['#00ff00', 'black'], text: 'TOOLS',         component: null },
+    { name: 'timeline', colors: ['#ffffff', 'black'], text: 'TIMELINE',      component: (<Timeline />), notFloating: true },
+    { name: 'empty',    colors: ['#000000', 'black'], text: '',              component: null },
 ]
 
 export default function Layers(props) {
@@ -39,9 +40,13 @@ export default function Layers(props) {
             {layersPerfs.map((layer, i) => {
                 if (layer.notFloating && uistate[layer.name]) return layer.component;
                 return (
-                    <Floating key={i} colors={layer.colors} title={layer.text} active={uistate[layer.name]} x={100 + i * 100} y={100 + i * 100}>
-                        {layer.component}
-                    </Floating>
+                    <Floating key={i} 
+                        component={layer.component}
+                        colors={layer.colors} 
+                        title={layer.text} 
+                        active={uistate[layer.name]} 
+                        x={100 + i * 100} 
+                        y={100 + i * 100} />
                 )
             })}
         </div>

@@ -11,6 +11,7 @@ import Rating from '../conponents/Rating';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { SideBarButton } from '../conponents/UIElements';
 import BackUpload from './BackUpload';
+import Segmentation from './Segmentation';
 
 const UploadContainer = styled.div`
     display: flex;
@@ -100,6 +101,7 @@ export default function Upload() {
                     <>
                         <UploadContainer>
                             <FrontUpload name={form.get('name')} updateFile={setFile} />
+                            {/* <Segmentation name={form.get('name')} updateFile={setFile} /> */}
                         </UploadContainer>
                         <UploadContainer>
                             <TopUpload name={form.get('name')} />

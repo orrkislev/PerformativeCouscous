@@ -13,6 +13,14 @@ const StateOfMindContainer = styled.div`
     gap: 1rem;
     color:yellow;
 `;
+const StateOfMindText = styled.div`
+    position: absolute;
+    bottom: 1em;
+    left: 1em;
+    font-size: 0.7rem;
+    width: 100%;
+    text-shadow: 0 0 10px yellow;
+`;
 
 
 export default function StateOfMind(props) {
@@ -74,7 +82,7 @@ export function MindVis(props) {
     return (
         <StateOfMindContainer>
             <svg width={`150px`} height={`150px`} viewBox={`0 0 150 150`}>
-                <circle cx={75} cy={75} r={50} stroke='yellow' fill="#FFFF0088" stroke-dasharray={satisfactionDashArray} stroke-linecap="round" stroke-width="4"/>
+                <circle cx={75} cy={75} r={50} stroke='yellow' fill="#FFFF0088" strokeDasharray={satisfactionDashArray} strokeLinecap="round" strokeWidth="4"/>
                 <circle cx={75} cy={75} r={45 * props.focus} fill='yellow'/>
             </svg> 
 
@@ -95,6 +103,10 @@ export function MindVis(props) {
                     </svg> */}
                 {/* </div> */}
             {/* )} */}
+            <StateOfMindText>
+                Focus: {Math.round(props.focus * 100)}%<br/>
+                Satisfaction: {Math.round(satisfaction * 100)}%
+            </StateOfMindText>
         </StateOfMindContainer>
     )
 }

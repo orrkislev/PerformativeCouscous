@@ -31,11 +31,8 @@ function HeaderLeft(props) {
             <HeaderElement active={page.page === 'home'} onClick={() => setpage({ page: 'home' })}>PERFORMATIVE COUSCOUS</HeaderElement>/
             <HeaderElement active={page.page === 'about'} onClick={() => setpage({ page: 'about' })}>ABOUT</HeaderElement>/
             <HeaderElement active={page.page === 'join'} onClick={() => setpage({ page: 'join', subpage: 1 })}>JOIN</HeaderElement>/
-            <div>PERFORMERS</div>
             {performance && (
-                <>
-                /<HeaderElement active={page.page === 'performance'} onClick={() => setpage({ page: 'performance'})}>{performance.name}</HeaderElement >
-                </>
+                <HeaderElement active={page.page === 'performance'} onClick={() => setpage({ page: 'performance'})}>{performance.name}</HeaderElement >
             )}
         </div>
     )
@@ -63,7 +60,6 @@ function HeaderRight(props) {
         <div style={{ display: 'flex', gap: '5em' }}>
             <ToggleButton text="Background" active={uistate.background} func={() => setuistate({ ...uistate, background: !uistate.background })} />
             <ToggleButton text="Story" active={uistate.story} func={() => setuistate({ ...uistate, story: !uistate.story })} />
-            <div>Recipe</div>
             <div>Profile</div>
         </div>
     )

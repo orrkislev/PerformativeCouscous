@@ -20,7 +20,7 @@ export default function Gesture(props) {
 
     if (!data) return <div>...</div>
 
-    return <HandsVis data={data.setTime(layersData.time).get()} height={150} />
+    return <HandsVis data={data.setTime(layersData.time).get()} width={props.size.width ?? 200} height={props.size.height ?? 200}/>
 }
 
 
@@ -29,25 +29,28 @@ export function HandsVis(props) {
     if (!props.data) return null;
 
     const paths = []
-    if (props.data.left) paths.push(...getHandPaths(props.data.left, props.height))
-    if (props.data.right) paths.push(...getHandPaths(props.data.right, props.height))
+    if (props.data.left) paths.push(...getHandPaths(props.data.left, props.width, props.height))
+    if (props.data.right) paths.push(...getHandPaths(props.data.right, props.width, props.height))
 
     return (
-        <svg width={`${props.height * 2}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height * 2} ${props.height}`} >
+        <svg width={`${props.width}px`} height={`${props.height}px`} viewBox={`0 0 ${props.width} ${props.height}`} >
             {paths.map((path, i) => (
-                <polyline key={i} points={path} stroke="white" />
+                <polyline key={i} points={path} stroke='#ff00ff' fill="#FF00FF88" strokeWidth={2} />
             ))}
         </svg>
     )
 }
 
-function getHandPaths(data, height) {
+
+function getHandPaths(data, width, height) {
     const newData = data.map(pos => {
         return {
-            x: (pos.x + 1) * height,
-            y: pos.y * height
+            x: pos.x * Math.min(width,height),
+            y: pos.y * Math.min(width,height)
         }
     })
+
+
     return [
         getPath(newData, [0, 1, 2, 3, 4]),
         getPath(newData, [0, 5, 9, 13, 17, 0]),
