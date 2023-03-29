@@ -30,7 +30,6 @@ export default function Pose(props){
 export function PoseVis(props) {
     if (!props.data) return null;
 
-
     const newData = props.data.map(pos => rescalePoint(pos, props.height))
     const midWidth = newData.filter(d=>!isNaN(d.x)).reduce((a, b) => a + b.x, 0) / newData.length
     newData.forEach(d => d.x -= midWidth - props.width / 2)

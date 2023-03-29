@@ -17,7 +17,6 @@ export const layersPerfs = [
     { name: 'pose',     colors: ['#ff0000', 'white'], text: 'POSE',          component: Pose },
     { name: 'rhythm',   colors: ['#0000ff', 'white'], text: 'RHYTHM',        component: Rhythm },
     { name: 'mind',     colors: ['#ffff00', 'black'], text: 'STATE OF MIND', component: StateOfMind },
-    { name: 'tools',    colors: ['#00ff00', 'black'], text: 'TOOLS',         component: null },
     { name: 'timeline', colors: ['#ffffff', 'black'], text: 'TIMELINE',      component: (<Timeline />), notFloating: true },
     { name: 'empty',    colors: ['#000000', 'black'], text: '',              component: null },
 ]

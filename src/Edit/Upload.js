@@ -78,7 +78,7 @@ export default function Upload() {
                     func={() => selectPerformer(null)}
                 />
             </div>
-            <div style={{ flex: 7, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ flex: 7, display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1em' }}>
                 <UploadContainer>
                     <InputWithLabel>
                         Name:<input type="text" value={form.get('name') ?? ''} name="name" onChange={form.handleChange} />

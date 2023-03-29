@@ -87,7 +87,7 @@ export default function FrontUpload(props) {
             <div style={{ display: 'flex' }}>
                 <video ref={vidRef} height={file ? '150px' : '0px'} />
                 {!file && <FileUploader handleChange={selectFile} name="file" label="סרטון מהמצלמה מקדימה"/>}
-                <PoseVis data={poseData} height={150} />
+                <PoseVis data={poseData} width={150} height={150} />
                 {expressionData && <MindVis focus={expressionData[0].focus} height={150} />}
             </div>
 

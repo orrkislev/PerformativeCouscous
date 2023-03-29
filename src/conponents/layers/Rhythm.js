@@ -45,16 +45,41 @@ export default function Rhythm(props) {
 export function RhythmVis(props) {
     if (!props.data) return null;
 
-    const pos = props.data.val < 0 ? props.data.posLeft : props.data.posRight
-    // console.log(props.data.posRight.y,props.data.posLeft.y)
-    const x = pos.x * props.height
-    const y = pos.y * props.height
-    const r = Math.abs(props.data.val) * Math.min(props.width, props.height) * 0.2
+    const pos1 = imagePosInContainer(props.data.posLeft.x, props.data.posLeft.y, props.width, props.height, 1920, 1080)
+    const pos2 = imagePosInContainer(props.data.posRight.x, props.data.posRight.y, props.width, props.height, 1920, 1080)
+    const r1 = props.data.valLeft * 30
+    const r2 = props.data.valRight * 30
 
     return (
-        <svg width={`${props.width}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height} ${props.height}`} >
-            <circle cx={x} cy={y} r={r} fill="blue" />
-            {/* <circle cx={50} cy={50} r={r} fill="blue" /> */}
+        <svg width={`${props.width}px`} height={`${props.height}px`} viewBox={`0 0 ${props.width} ${props.height}`} >
+            <circle cx={pos1.x} cy={pos1.y} r={r1} fill="blue" />
+            <circle cx={pos2.x} cy={pos2.y} r={r2} fill="blue" />
         </svg>
     )
+}
+
+function imagePosInContainer(x, y, containerWidth, containerHeight, imageWidth, imageHeight) {
+    const imageRatio = imageWidth / imageHeight;
+    const containerRatio = containerWidth / containerHeight;
+    let scale = 1
+    if (imageRatio > containerRatio) {
+        scale = containerHeight / imageHeight;
+    } else {
+        scale = containerWidth / imageWidth;
+    }
+
+    const scaledWidth = imageWidth * scale;
+    const scaledHeight = imageHeight * scale;
+
+    const scaledX = x * scaledWidth;
+    const scaledY = y * scaledHeight;
+
+    const offsetX = (scaledWidth - containerWidth) / 2;
+    const offsetY = (scaledHeight - containerHeight) / 2;
+
+
+    return {
+        x: scaledX - offsetX,
+        y: scaledY - offsetY,
+    }
 }

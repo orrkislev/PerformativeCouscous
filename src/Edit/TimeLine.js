@@ -19,7 +19,7 @@ const VidPreview = styled.video`
     object-fit: cover;
     border-radius: 10px;
     position: absolute;
-    top: 10px;
+    bottom: 10px;
     `;
 
 const EventDot = styled.div`
