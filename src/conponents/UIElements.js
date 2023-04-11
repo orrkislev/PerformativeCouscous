@@ -72,3 +72,12 @@ export function ToggleButton(props) {
         </div>
     );
 }
+
+export function ToggleSmallButton(props) {
+    const markStyle = { backgroundColor: 'white', color: 'black' }
+    return (
+        <div onClick={props.func}>
+            <span style={props.active ? markStyle : {}}>{props.text}</span>
+        </div>
+    );
+}

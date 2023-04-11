@@ -12,6 +12,7 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { SideBarButton } from '../conponents/UIElements';
 import BackUpload from './BackUpload';
 import Segmentation from './Segmentation';
+import StoryUpload from './StoryUpload';
 
 const UploadContainer = styled.div`
     display: flex;
@@ -25,7 +26,6 @@ const InputWithLabel = styled.div`
     display: flex;
     justify-content: space-between;
     gap: 0.5rem;
-    width: 30%;
     `;
 
 export default function Upload() {
@@ -52,6 +52,7 @@ export default function Upload() {
         removeFile(`${name}-rhythm`)
         removeFile(`${name}-top`)
         removeFile(`${name}-gesture`)
+        removeFile(`${name}-story`)
 
         form.reset()
     }
@@ -80,19 +81,33 @@ export default function Upload() {
             </div>
             <div style={{ flex: 7, display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1em' }}>
                 <UploadContainer>
-                    <InputWithLabel>
-                        Name:<input type="text" value={form.get('name') ?? ''} name="name" onChange={form.handleChange} />
-                    </InputWithLabel>
-                    <InputWithLabel>
-                        {/* Skill Level:<input type="text" value={form.get('proficienty')} name="proficiency" onChange={form.handleChange} /> */}
-                        Skill Level:<Rating value={form.get('proficienty')} onChange={v => form.set('proficienty', v)} />
-                    </InputWithLabel>
-                    <InputWithLabel>
-                        Age:<input type="text" value={form.get('age') ?? ''} name="age" onChange={form.handleChange} />
-                    </InputWithLabel>
-                    <InputWithLabel>
-                        Location:<input type="text" value={form.get('location') ?? ''} name="location" onChange={form.handleChange} />
-                    </InputWithLabel>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <InputWithLabel>
+                            Name:<input type="text" value={form.get('name') ?? ''} name="name" onChange={form.handleChange} />
+                        </InputWithLabel>
+                        <InputWithLabel>
+                            Skill Level:<Rating value={form.get('proficienty')} onChange={v => form.set('proficienty', v)} />
+                        </InputWithLabel>
+                        <InputWithLabel>
+                            Age:<input type="text" value={form.get('age') ?? ''} name="age" onChange={form.handleChange} />
+                        </InputWithLabel>
+                        <InputWithLabel>
+                            Recipe Origin:<input type="text" value={form.get('origin') ?? ''} name="origin" onChange={form.handleChange} />
+                        </InputWithLabel>
+                        <InputWithLabel>
+                            Filming Location:<input type="text" value={form.get('location') ?? ''} name="location" onChange={form.handleChange} />
+                        </InputWithLabel>
+                        <InputWithLabel>
+                            Filming Date:<input type="text" value={form.get('date') ?? ''} name="date" onChange={form.handleChange} />
+                        </InputWithLabel>
+                        <InputWithLabel>
+                            Couscous Heritage:<input type="text" value={form.get('heritage') ?? ''} name="heritage" onChange={form.handleChange} />
+                        </InputWithLabel>
+                        <InputWithLabel>
+                            Learned from:<input type="text" value={form.get('learned') ?? ''} name="learned" onChange={form.handleChange} />
+                        </InputWithLabel>
+                    </div>
+
                     <button onClick={savePerformer}>Submit</button>
                 </UploadContainer>
 
@@ -110,8 +125,12 @@ export default function Upload() {
                             <BackUpload name={form.get('name')} />
                         </UploadContainer>
                         <UploadContainer>
+                            <StoryUpload name={form.get('name')} />
+                        </UploadContainer>
+                        <UploadContainer>
                             {file && <TimeLineInput value={form.get('timeline')} name={form.get('name')} file={file} />}
                         </UploadContainer>
+
                     </>
                 )}
             </div >

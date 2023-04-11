@@ -7,6 +7,7 @@ import Rhythm from './layers/Rhythm';
 import StateOfMind from './layers/StateOfMind';
 import Timeline from './layers/TimeLine';
 import { uiStateAtom } from './UI';
+import Profile from './Profile';
 
 export const layersDataAtom = atom({ key: 'layersData', default: { time: 0, reset: 0 } });
 export const performanceAtom = new atom({ key: 'performance', default: {} });
@@ -33,6 +34,8 @@ export default function Layers(props) {
         }, 50);
         return () => clearInterval(interval);
     }, [layersData.time])
+
+    if (uistate.profile) return null
 
     return (
         <div>
