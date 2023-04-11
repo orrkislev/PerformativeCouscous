@@ -14,6 +14,7 @@ export default function FrontUpload(props) {
 
     const allPoseData = useRef(new DataContainer());
     const allExpressionData = useRef(new DataContainer());
+    const allFaceData = useRef(new DataContainer());
 
     const [poseData, setPoseData] = useState(null);
     const [expressionData, setExpressionData] = useState(null);
@@ -21,6 +22,15 @@ export default function FrontUpload(props) {
     const onPoseResult = (results) => {
         let positions = null
         if (results.poseLandmarks) {
+            const headPos = results.poseLandmarks[0];
+            const shoulder1 = results.poseLandmarks[12];
+            const shoulder2 = results.poseLandmarks[11];
+            const top = headPos.y - (shoulder1.y - headPos.y);
+            const left = Math.min(shoulder1.x, shoulder2.x);
+            const width = Math.abs(shoulder1.x - shoulder2.x);
+            const height = Math.abs(shoulder1.y - top);
+            allFaceData.current.insert({ top, left, width, height }, vidRef.current.currentTime);
+
             positions = results.poseLandmarks.map(landmark => {
                 return { x: landmark.x * vidRef.current.videoWidth, y: landmark.y * vidRef.current.videoHeight }
             })
@@ -51,7 +61,7 @@ export default function FrontUpload(props) {
         const nextFrameCalc = async () => {
             await holi.send({ image: video })
             const newExpressions = await faceExpression.predict(video)
-            allExpressionData.current.insert(newExpressions, vidRef.current.currentTime)
+            allExpressionData.current.insert(newExpressions, vidRef.current.currentTime);
             setExpressionData(newExpressions)
 
             video.currentTime += 1 / 20;
@@ -62,6 +72,7 @@ export default function FrontUpload(props) {
                 allPoseData.current.fillGaps();
                 Pose_calcStuff(allPoseData.current)
                 allExpressionData.current.fillGaps();
+                allFaceData.current.fillGaps();
                 video.requestVideoFrameCallback(nextFrameDisplay);
             } else video.requestVideoFrameCallback(nextFrameCalc);
         }
@@ -86,7 +97,7 @@ export default function FrontUpload(props) {
         <div>
             <div style={{ display: 'flex' }}>
                 <video ref={vidRef} height={file ? '150px' : '0px'} />
-                {!file && <FileUploader handleChange={selectFile} name="file" label="סרטון מהמצלמה מקדימה"/>}
+                {!file && <FileUploader handleChange={selectFile} name="file" label="סרטון מהמצלמה מקדימה" />}
                 <PoseVis data={poseData} width={150} height={150} />
                 {expressionData && <MindVis focus={expressionData[0].focus} height={150} />}
             </div>
@@ -99,6 +110,8 @@ export default function FrontUpload(props) {
                         file={new Blob([JSON.stringify(allPoseData.current.data)], { type: "application/json" })} />
                     <UploadFile name={`${props.name}-expression`}
                         file={new Blob([JSON.stringify(allExpressionData.current.data)], { type: "application/json" })} />
+                    <UploadFile name={`${props.name}-portrait`}
+                        file={new Blob([JSON.stringify(allFaceData.current.data)], { type: "application/json" })} />
                 </div>
             )}
         </div>

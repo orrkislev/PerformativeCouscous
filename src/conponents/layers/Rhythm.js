@@ -4,12 +4,14 @@ import { useRecoilValue } from "recoil";
 import { DataContainer } from "../../Edit/Data";
 import { storageRef } from "../../utils/useFirebase";
 import { layersDataAtom, performanceAtom } from "../Layers";
+import { uiStateAtom } from "../UI";
 
 export default function Rhythm(props) {
     const performance = useRecoilValue(performanceAtom);
     const layersData = useRecoilValue(layersDataAtom);
     const [data, setData] = useState(null);
     const [src, setsrc] = useState(null);
+    const uistate = useRecoilValue(uiStateAtom);
     const vidRef = useRef(null);
 
 
@@ -32,12 +34,19 @@ export default function Rhythm(props) {
 
     if (!data) return <div>...</div>
 
+    const showVis = uistate.rhythm != null ? (uistate.rhythm == 1 || uistate.rhythm == 2) : true;
+    const showVid = uistate.rhythm != null ? (uistate.rhythm == 1 || uistate.rhythm == 3) : true;
+
     return (
         <>
-            <video style={{ width: props.size.width + "px", height: props.size.height + "px", objectFit: 'cover', position: 'absolute', zIndex: -1 }} ref={vidRef} >
-                <source src={src} type="video/mp4" />
-            </video>
-            <RhythmVis data={data.setTime(layersData.time).get()} width={props.size.width} height={props.size.height} />
+            {showVid &&
+                <video style={{ width: props.size.width + "px", height: props.size.height + "px", objectFit: 'cover', position: 'absolute', zIndex: -1 }} ref={vidRef} >
+                    <source src={src} type="video/mp4" />
+                </video>
+            }
+            {showVis &&
+                <RhythmVis data={data.setTime(layersData.time).get()} width={props.size.width} height={props.size.height} />
+            }
         </>
     )
 }
@@ -58,7 +67,7 @@ export function RhythmVis(props) {
     )
 }
 
-function imagePosInContainer(x, y, containerWidth, containerHeight, imageWidth, imageHeight) {
+export function imagePosInContainer(x, y, containerWidth, containerHeight, imageWidth, imageHeight) {
     const imageRatio = imageWidth / imageHeight;
     const containerRatio = containerWidth / containerHeight;
     let scale = 1

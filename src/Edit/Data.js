@@ -71,7 +71,6 @@ export class DataContainer {
             }
         }
     }
-
 }
 
 const lerpGeneral = (a, b, t) => {

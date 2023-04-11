@@ -1,5 +1,5 @@
 import { getDownloadURL } from "firebase/storage";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { DataContainer } from "../../Edit/Data";
 import { storageRef } from "../../utils/useFirebase";
@@ -27,13 +27,24 @@ export default function StateOfMind(props) {
     const performance = useRecoilValue(performanceAtom);
     const layersData = useRecoilValue(layersDataAtom);
     const [data, setData] = useState(null);
+    const [portrait, setPortrait] = useState(null);
     const [satisfactionData, setSatisfactionData] = useState([]);
+    const [src, setsrc] = useState(null);
+    const vidRef = useRef(null);
 
     useEffect(() => {
         getDownloadURL(storageRef(`${performance.name}-expression`)).then((url) => {
             fetch(url).then((res) => res.json()).then((data) => {
                 setData(new DataContainer(data));
             })
+        })
+        getDownloadURL(storageRef(`${performance.name}-portrait`)).then((url) => {
+            fetch(url).then((res) => res.json()).then((data) => {
+                setPortrait(new DataContainer(data));
+            })
+        })
+        getDownloadURL(storageRef(`${performance.name}-front`)).then((url) => {
+            setsrc(url);
         })
     }, [performance])
 
@@ -48,15 +59,50 @@ export default function StateOfMind(props) {
         }
     }, [data, layersData])
 
-    if (!data) return <div>...</div>
+    useEffect(() => {
+        if (vidRef.current) {
+            vidRef.current.currentTime = layersData.time;
+        }
+    }, [layersData.time])
 
+    if (!data) return <div>...</div>
     const frameData = data.setTime(layersData.time).get()
     if (!frameData) return null
+
+    const portraitData = portrait?.setTime(layersData.time).get()
+    let vidData = null
+    if (portraitData) {
+        // console.log(portraitData)
+        vidData = {}
+        vidData.containerHeight = props.size.height
+        vidData.vidHeight = vidData.containerHeight / portraitData.height
+        const ratio = portraitData.width / portraitData.height
+        vidData.containerWidth = vidData.containerHeight * ratio
+        if (vidData.containerWidth > props.size.width) {
+            vidData.containerWidth = props.size.width
+            vidData.containerHeight = vidData.containerWidth / ratio
+            vidData.vidHeight = vidData.containerHeight / portraitData.height
+        }
+        const vidRatio = 1080 / 1920
+        vidData.vidWidth = vidData.vidHeight * vidRatio
+        vidData.vidLeft = portraitData.left * vidData.vidWidth
+        vidData.vidTop = portraitData.top * vidData.vidHeight
+        console.log(vidData)
+    }
 
     const expressions = frameData[0]
 
     return (
-        <MindVis satisfaction={satisfactionData} focus={expressions.focus} height={150}/>
+        <>
+            {vidData &&
+                <div style={{width: props.size.width, height: props.size.height, position: 'absolute', overflow: 'hidden'}}>
+                    <video style={{ width: vidData.vidWidth, height: vidData.vidHeight, marginLeft: `-${vidData.vidLeft}px`, marginTop: `-${vidData.vidTop}px`, objectFit: 'cover', position: 'absolute', zIndex: -1 }} ref={vidRef} >
+                        <source src={src} type="video/mp4" />
+                    </video>
+                </div>
+            }
+            <MindVis satisfaction={satisfactionData} focus={expressions.focus} height={150} />
+        </>
     )
 }
 
@@ -82,29 +128,29 @@ export function MindVis(props) {
     return (
         <StateOfMindContainer>
             <svg width={`150px`} height={`150px`} viewBox={`0 0 150 150`}>
-                <circle cx={75} cy={75} r={50} stroke='yellow' fill="#FFFF0088" strokeDasharray={satisfactionDashArray} strokeLinecap="round" strokeWidth="4"/>
-                <circle cx={75} cy={75} r={45 * props.focus} fill='yellow'/>
-            </svg> 
+                <circle cx={75} cy={75} r={50} stroke='yellow' fill="#FFFF0088" strokeDasharray={satisfactionDashArray} strokeLinecap="round" strokeWidth="4" />
+                <circle cx={75} cy={75} r={45 * props.focus} fill='yellow' />
+            </svg>
 
             {/* {path && ( */}
-                {/*  <div> */}
-                    {/* satisfaction: */}
-                    {/* <svg width="100%" height="100%" viewBox="0 0 100 50"> */}
-                        {/* <path d={path} stroke="yellow" fill="none" /> */}
-                    {/* </svg> */}
-                {/* </div> */}
+            {/*  <div> */}
+            {/* satisfaction: */}
+            {/* <svg width="100%" height="100%" viewBox="0 0 100 50"> */}
+            {/* <path d={path} stroke="yellow" fill="none" /> */}
+            {/* </svg> */}
+            {/* </div> */}
             {/* )} */}
             {/* {props.focus && ( */}
-                {/* <div> */}
-                    {/* focus: */}
-                    {/* <svg width={`${props.height * 2}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height * 2} ${props.height}`}>
+            {/* <div> */}
+            {/* focus: */}
+            {/* <svg width={`${props.height * 2}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height * 2} ${props.height}`}>
                         <circle cx={100} cy={100} r={props.height * .2} stroke='yellow' fill="#FFFF0088" />
                         {props.focus && <circle cx={100} cy={100} r={props.height * .18 * props.focus} fill='yellow' />}
                     </svg> */}
-                {/* </div> */}
+            {/* </div> */}
             {/* )} */}
             <StateOfMindText>
-                Focus: {Math.round(props.focus * 100)}%<br/>
+                Focus: {Math.round(props.focus * 100)}%<br />
                 Satisfaction: {Math.round(satisfaction * 100)}%
             </StateOfMindText>
         </StateOfMindContainer>

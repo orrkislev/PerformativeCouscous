@@ -1,36 +1,43 @@
 import { createElement, useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
 import styled from 'styled-components'
+import { uiStateAtom } from './UI';
 
 const FloatingContainer = styled.div`
-        position: absolute;
-        z-index: 999;
-        border: 2px solid ${props => props.color};
-    `;
+    position: absolute;
+    z-index: 999;
+    border: 2px solid ${props => props.color};
+`;
 
 const FloatingHeader = styled.div`
-        background: ${props => props.background};
-        color: ${props => props.color};
-        font-weight: bold;
-        font-size: 1.3em;
-        text-transform: uppercase;
-        `;
-// floating resize - small triangle at the bottom right corner
+    background: ${props => props.background};
+    color: ${props => props.color};
+    font-weight: bold;
+    font-size: 1.3em;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+`;
+
 const FloatingResize = styled.div`
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        width: 0;
-        height: 0;
-        border-left: 1em solid transparent;
-        border-bottom: 1em solid ${props => props.color};
-        cursor: nwse-resize;
-    `;
-
-const FloatingContent = styled.div`
-        padding: .5em 1em;
-    `;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-left: 1em solid transparent;
+    border-bottom: 1em solid ${props => props.color};
+    cursor: nwse-resize;
+`;
 
 
+const FloatingTitleToggle = styled.div`
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 3px solid white;
+    cursor: pointer;
+`;
 
 
 
@@ -45,7 +52,7 @@ export default function Floating(props) {
 
     useEffect(() => {
         window.addEventListener("mousemove", handleMouseMove);
-        
+
 
         function handleMouseMove(e) {
             if (drag) setPos({ x: e.pageX - offset.x, y: e.pageY - offset.y });
@@ -55,7 +62,7 @@ export default function Floating(props) {
                 setSize({ width: newWidth, height: newHeight });
             };
         }
-        
+
         return () => {
             window.removeEventListener("mousemove", handleMouseMove);
         }
@@ -81,11 +88,11 @@ export default function Floating(props) {
 
     if (!props.active) return null
 
-    let component = createElement(props.component, { size: {width: size.width, height: size.height - 25} });
+    let component = createElement(props.component, { size: { width: size.width, height: size.height - 25 } });
 
 
     return (
-        <FloatingContainer style={{left: pos.x, top: pos.y, width: size.width, height: size.height}}
+        <FloatingContainer style={{ left: pos.x, top: pos.y, width: size.width, height: size.height }}
             color={props.colors[0]} >
 
             <FloatingHeader
@@ -94,11 +101,13 @@ export default function Floating(props) {
                 onMouseDown={handleMouseDown}
                 onMouseUp={() => setDrag(false)} >
                 {props.title}
+
+                {props.toggle &&
+                    <FloatingToggles name={props.toggle}/>   
+                }
             </FloatingHeader>
 
-            {/* <FloatingContent> */}
-                {component}
-            {/* </FloatingContent> */}
+            {component}
 
             <FloatingResize
                 color={props.colors[0]}
@@ -106,4 +115,27 @@ export default function Floating(props) {
                 onMouseUp={() => setResize(false)} />
         </FloatingContainer>
     );
+}
+
+function FloatingToggles(props) {
+    const [uistate, setUIState] = useRecoilState(uiStateAtom)
+    const [state,setState] = useState(1);
+
+    useEffect(()=>{
+        setUIState({...uistate,[props.name]:state})
+    },[state])
+
+
+    function click() {
+        setState(((state+1) % 3) + 1);
+    }
+
+    const states = {1:'DATA & VIDEO', 2:'DATA', 3:'VIDEO'};
+
+    return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.2em', fontSize: '0.5em', marginRight: '0.4em', cursor: 'pointer' }}
+            onClick={click}>
+            {states[state]}
+        </div>
+    )
 }

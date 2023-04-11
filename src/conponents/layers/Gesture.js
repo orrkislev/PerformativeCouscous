@@ -1,14 +1,19 @@
 import { getDownloadURL } from "firebase/storage";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { DataContainer, getPath } from "../../Edit/Data";
 import { storageRef } from "../../utils/useFirebase";
 import { layersDataAtom, performanceAtom } from "../Layers";
+import { imagePosInContainer } from "./Rhythm";
+import { uiStateAtom } from "../UI";
 
 export default function Gesture(props) {
     const performance = useRecoilValue(performanceAtom);
     const layersData = useRecoilValue(layersDataAtom);
     const [data, setData] = useState(null);
+    const [src, setsrc] = useState(null);
+    const vidRef = useRef(null);
+    const uistate = useRecoilValue(uiStateAtom);
 
     useEffect(() => {
         getDownloadURL(storageRef(`${performance.name}-gesture`)).then((url) => {
@@ -16,11 +21,35 @@ export default function Gesture(props) {
                 setData(new DataContainer(data));
             })
         })
+        getDownloadURL(storageRef(`${performance.name}-top`)).then((url) => {
+            setsrc(url);
+        })
     }, [performance])
+
+    useEffect(() => {
+        if (vidRef.current) {
+            vidRef.current.currentTime = layersData.time;
+        }
+    }, [layersData.time])
 
     if (!data) return <div>...</div>
 
-    return <HandsVis data={data.setTime(layersData.time).get()} width={props.size.width ?? 200} height={props.size.height ?? 200}/>
+    const showVis = uistate.gesture != null ? (uistate.gesture == 1 || uistate.gesture == 2) : true;
+    const showVid = uistate.gesture != null ? (uistate.gesture == 1 || uistate.gesture == 3) : true;
+
+    return (
+        <>  
+            {showVid && 
+                <video style={{ width: props.size.width + "px", height: props.size.height + "px", objectFit: 'cover', position: 'absolute', zIndex: -1 }} ref={vidRef} >
+                    <source src={src} type="video/mp4" />
+                </video>
+            }
+            {showVis &&
+                <HandsVis data={data.setTime(layersData.time).get()} width={props.size.width ?? 200} height={props.size.height ?? 200}/>
+            }
+        </>
+    ) 
+        
 }
 
 
@@ -43,11 +72,9 @@ export function HandsVis(props) {
 
 
 function getHandPaths(data, width, height) {
+
     const newData = data.map(pos => {
-        return {
-            x: pos.x * Math.min(width,height),
-            y: pos.y * Math.min(width,height)
-        }
+        return imagePosInContainer(pos.x, pos.y, width, height, 1920, 1080)
     })
 
 
