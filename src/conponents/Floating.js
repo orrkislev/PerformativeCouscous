@@ -17,6 +17,7 @@ const FloatingHeader = styled.div`
     text-transform: uppercase;
     display: flex;
     justify-content: space-between;
+    white-space: nowrap;
 `;
 
 const FloatingResize = styled.div`
@@ -57,7 +58,7 @@ export default function Floating(props) {
         function handleMouseMove(e) {
             if (drag) setPos({ x: e.pageX - offset.x, y: e.pageY - offset.y });
             if (resize) {
-                const newWidth = Math.max(e.pageX - pos.x, 50);
+                const newWidth = Math.max(e.pageX - pos.x, 200);
                 const newHeight = Math.max(e.pageY - pos.y, 200);
                 setSize({ width: newWidth, height: newHeight });
             };

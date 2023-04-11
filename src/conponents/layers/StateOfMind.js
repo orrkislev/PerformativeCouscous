@@ -5,6 +5,7 @@ import { DataContainer } from "../../Edit/Data";
 import { storageRef } from "../../utils/useFirebase";
 import { layersDataAtom, performanceAtom } from "../Layers";
 import styled from "styled-components";
+import { uiStateAtom } from "../UI";
 
 const StateOfMindContainer = styled.div`
     display: flex;
@@ -31,6 +32,7 @@ export default function StateOfMind(props) {
     const [satisfactionData, setSatisfactionData] = useState([]);
     const [src, setsrc] = useState(null);
     const vidRef = useRef(null);
+    const uistate = useRecoilValue(uiStateAtom);
 
     useEffect(() => {
         getDownloadURL(storageRef(`${performance.name}-expression`)).then((url) => {
@@ -66,42 +68,48 @@ export default function StateOfMind(props) {
     }, [layersData.time])
 
     if (!data) return <div>...</div>
+
     const frameData = data.setTime(layersData.time).get()
     if (!frameData) return null
 
-    const portraitData = portrait?.setTime(layersData.time).get()
+    const showVis = uistate.mind != null ? (uistate.mind == 1 || uistate.mind == 2) : true;
+    const showVid = uistate.mind != null ? (uistate.mind == 1 || uistate.mind == 3) : true;
+
     let vidData = null
-    if (portraitData) {
-        // console.log(portraitData)
-        vidData = {}
-        vidData.containerHeight = props.size.height
-        vidData.vidHeight = vidData.containerHeight / portraitData.height
-        const ratio = portraitData.width / portraitData.height
-        vidData.containerWidth = vidData.containerHeight * ratio
-        if (vidData.containerWidth > props.size.width) {
-            vidData.containerWidth = props.size.width
-            vidData.containerHeight = vidData.containerWidth / ratio
+    if (showVid) {
+        const portraitData = portrait?.setTime(layersData.time).get()
+        if (portraitData) {
+            // console.log(portraitData)
+            vidData = {}
+            vidData.containerHeight = props.size.height
             vidData.vidHeight = vidData.containerHeight / portraitData.height
+            const ratio = portraitData.width / portraitData.height
+            vidData.containerWidth = vidData.containerHeight * ratio
+            if (vidData.containerWidth > props.size.width) {
+                vidData.containerWidth = props.size.width
+                vidData.containerHeight = vidData.containerWidth / ratio
+                vidData.vidHeight = vidData.containerHeight / portraitData.height
+            }
+            const vidRatio = 1080 / 1920
+            vidData.vidWidth = vidData.vidHeight * vidRatio
+            vidData.vidLeft = portraitData.left * vidData.vidWidth
+            vidData.vidTop = portraitData.top * vidData.vidHeight
+            console.log(vidData)
         }
-        const vidRatio = 1080 / 1920
-        vidData.vidWidth = vidData.vidHeight * vidRatio
-        vidData.vidLeft = portraitData.left * vidData.vidWidth
-        vidData.vidTop = portraitData.top * vidData.vidHeight
-        console.log(vidData)
     }
 
     const expressions = frameData[0]
 
     return (
         <>
-            {vidData &&
-                <div style={{width: props.size.width, height: props.size.height, position: 'absolute', overflow: 'hidden'}}>
+            {vidData && showVid &&
+                <div style={{ width: props.size.width, height: props.size.height, position: 'absolute', overflow: 'hidden' }}>
                     <video style={{ width: vidData.vidWidth, height: vidData.vidHeight, marginLeft: `-${vidData.vidLeft}px`, marginTop: `-${vidData.vidTop}px`, objectFit: 'cover', position: 'absolute', zIndex: -1 }} ref={vidRef} >
                         <source src={src} type="video/mp4" />
                     </video>
                 </div>
             }
-            <MindVis satisfaction={satisfactionData} focus={expressions.focus} height={150} />
+            {showVis && <MindVis satisfaction={satisfactionData} focus={expressions.focus} height={150} />}
         </>
     )
 }

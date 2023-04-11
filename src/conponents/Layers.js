@@ -14,10 +14,10 @@ export const performanceAtom = new atom({ key: 'performance', default: {} });
 
 
 export const layersPerfs = [
-    { name: 'gestures', colors: ['#ff00ff', 'white'], text: 'GESTURE',       component: Gesture , toggle: 'gesture'},
+    { name: 'gestures', colors: ['#ff00ff', 'white'], text: 'GESTURE',       component: Gesture ,    toggle: 'gesture'},
     { name: 'pose',     colors: ['#ff0000', 'white'], text: 'POSE',          component: Pose },
-    { name: 'rhythm',   colors: ['#0000ff', 'white'], text: 'RHYTHM',        component: Rhythm ,  toggle: 'rhythm'},
-    { name: 'mind',     colors: ['#ffff00', 'black'], text: 'STATE OF MIND', component: StateOfMind },
+    { name: 'rhythm',   colors: ['#0000ff', 'white'], text: 'RHYTHM',        component: Rhythm ,     toggle: 'rhythm'},
+    { name: 'mind',     colors: ['#ffff00', 'black'], text: 'STATE OF MIND', component: StateOfMind, toggle:'mind' },
     { name: 'timeline', colors: ['#ffffff', 'black'], text: 'TIMELINE',      component: (<Timeline />), notFloating: true },
     { name: 'empty',    colors: ['#000000', 'black'], text: '',              component: null },
 ]
