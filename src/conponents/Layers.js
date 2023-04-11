@@ -35,8 +35,6 @@ export default function Layers(props) {
         return () => clearInterval(interval);
     }, [layersData.time])
 
-    if (uistate.profile) return null
-
     return (
         <div>
             {layersPerfs.map((layer, i) => {

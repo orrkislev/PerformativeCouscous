@@ -1,11 +1,11 @@
-import { createElement, useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
+import { createElement, useEffect, useRef, useState } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components'
 import { uiStateAtom } from './UI';
 
 const FloatingContainer = styled.div`
     position: absolute;
-    z-index: 999;
+    z-index: 998;
     border: 2px solid ${props => props.color};
 `;
 
@@ -32,24 +32,19 @@ const FloatingResize = styled.div`
 `;
 
 
-const FloatingTitleToggle = styled.div`
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    border: 3px solid white;
-    cursor: pointer;
-`;
-
-
 
 
 export default function Floating(props) {
+    const uistate = useRecoilValue(uiStateAtom)
+
     const [pos, setPos] = useState({ x: props.x ?? 0, y: props.y ?? 0 });
     const [drag, setDrag] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
 
     const [resize, setResize] = useState(false);
     const [size, setSize] = useState({ width: props.width ?? 200, height: props.height ?? 200 });
+
+    const thisRef = useRef(null)
 
     useEffect(() => {
         window.addEventListener("mousemove", handleMouseMove);
@@ -79,6 +74,12 @@ export default function Floating(props) {
         setDrag(true);
         setOffset({ x: e.clientX - pos.x, y: e.clientY - pos.y });
         window.addEventListener("mouseup", handleMouseUp);
+
+        const allFloating = document.querySelectorAll('.floating');
+        allFloating.forEach(floating => {
+            floating.style.zIndex = 998;
+        })
+        thisRef.current.style.zIndex = 999;
     }
 
     function startResize(e) {
@@ -91,10 +92,9 @@ export default function Floating(props) {
 
     let component = createElement(props.component, { size: { width: size.width, height: size.height - 25 } });
 
-
     return (
-        <FloatingContainer style={{ left: pos.x, top: pos.y, width: size.width, height: size.height }}
-            color={props.colors[0]} >
+        <FloatingContainer className="floating" style={{ left: pos.x, top: pos.y, width: size.width, height: size.height, display: uistate.profile ? 'none' : 'block'}}
+            color={props.colors[0]} ref={thisRef}>
 
             <FloatingHeader
                 background={props.colors[0]}

@@ -79,7 +79,6 @@ export default function StateOfMind(props) {
     if (showVid) {
         const portraitData = portrait?.setTime(layersData.time).get()
         if (portraitData) {
-            // console.log(portraitData)
             vidData = {}
             vidData.containerHeight = props.size.height
             vidData.vidHeight = vidData.containerHeight / portraitData.height
@@ -94,7 +93,6 @@ export default function StateOfMind(props) {
             vidData.vidWidth = vidData.vidHeight * vidRatio
             vidData.vidLeft = portraitData.left * vidData.vidWidth
             vidData.vidTop = portraitData.top * vidData.vidHeight
-            console.log(vidData)
         }
     }
 

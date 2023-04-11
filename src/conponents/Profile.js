@@ -29,8 +29,6 @@ export default function Profile(props) {
 
     if (!uistate.profile) return null;
 
-    console.log(performance)
-
     return (
         <Centered wide>
             <h1>PERFORMER DATA</h1>

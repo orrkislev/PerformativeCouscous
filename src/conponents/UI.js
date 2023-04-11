@@ -15,8 +15,6 @@ export default function UI() {
     const page = useRecoilValue(pageAtom);
     const uistate = useRecoilValue(uiStateAtom);
 
-    console.log(uistate)
-
     return (
         <UIContainer>
             <Header />
