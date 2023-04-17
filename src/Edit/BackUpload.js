@@ -10,6 +10,7 @@ export default function BackUpload(props) {
     const vidRef = useRef(null);
     const [ready, setReady] = useState(false);
 
+    const lastPos = useRef(null)
     const allRhythmData = useRef(new DataContainer());
     const opFlow = useRef(null);
     const [rhythmData, setRhythmData] = useState(null);
@@ -17,14 +18,26 @@ export default function BackUpload(props) {
     const onPoseResult = (results) => {
 
         let rhythmVals = null
-        if (results.poseLandmarks && opFlow.current) {
-            const hip_right = results.poseLandmarks[23]
-            const hip_left = results.poseLandmarks[24]
-            rhythmVals = {
-                valRight: opFlow.current.getFlow(hip_right.x, hip_right.y, 0.1),
-                valLeft: opFlow.current.getFlow(hip_left.x, hip_left.y, 0.1),
-                posRight: hip_right, posLeft: hip_left
+        if (results.poseLandmarks) {
+            const posRight = results.poseLandmarks[23]
+            const posLeft = results.poseLandmarks[24]
+            if (!lastPos.current) {
+                lastPos.current = { posRight, posLeft }
+            } else {
+                let valRight = Math.sqrt((posRight.x - lastPos.current.posRight.x) ** 2 + (posRight.y - lastPos.current.posRight.y) ** 2)
+                let valLeft = Math.sqrt((posLeft.x - lastPos.current.posLeft.x) ** 2 + (posLeft.y - lastPos.current.posLeft.y) ** 2)
+                valRight = Math.min(valRight, 0.01)
+                valLeft = Math.min(valLeft, 0.01)
+                lastPos.current = { posRight, posLeft }
+                rhythmVals = { valLeft, valRight, posRight, posLeft }
             }
+            // rhythmVals = {
+            // valRight: opFlow.current.getFlow(posRight.x, posRight.y, 0.1),
+            // valLeft: opFlow.current.getFlow(posLeft.x, posLeft.y, 0.1),
+            // posRight, posLeft
+            // }
+        } else {
+            lastPos.current = null
         }
         allRhythmData.current.insert(rhythmVals, vidRef.current.currentTime);
         setRhythmData(rhythmVals)
@@ -38,10 +51,10 @@ export default function BackUpload(props) {
 
         const pose = new Holistic({ locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}` });
         pose.onResults(onPoseResult);
-        opFlow.current = new OpticalFlow(video);
+        // opFlow.current = new OpticalFlow(video);
 
         const nextFrameCalc = async () => {
-            opFlow.current.update()
+            // opFlow.current.update()
             await pose.send({ image: video })
 
 

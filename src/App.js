@@ -6,8 +6,7 @@ import { useRecoilValue } from 'recoil';
 import Join from "./conponents/Join";
 import About from "./conponents/About";
 import Home from "./conponents/Home";
-import Story from "./conponents/Story";
-import Profile from "./conponents/Profile";
+import Audio from "./conponents/Audio";
 
 export default function App() {
   const page = useRecoilValue(pageAtom);
@@ -17,10 +16,10 @@ export default function App() {
         {page.page === 'join' && <Join />}
         {page.page === 'about' && <About />}
         {page.page === 'home' && <Home />}
-        {page.page === 'performance' && <Layers />}
         {page.page === 'performance' && <Background />}
-        {page.page === 'performance' && <Story />}
+        {page.page === 'performance' && <Audio />}
         <UI />
+        {page.page === 'performance' && <Layers />}
     </div>
   );
 }

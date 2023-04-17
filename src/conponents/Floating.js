@@ -31,19 +31,18 @@ const FloatingResize = styled.div`
     cursor: nwse-resize;
 `;
 
-
-
-
+const minSize = 230
 export default function Floating(props) {
     const uistate = useRecoilValue(uiStateAtom)
 
     const [pos, setPos] = useState({ x: props.x ?? 0, y: props.y ?? 0 });
+    const [size, setSize] = useState({ width: props.width ?? minSize, height: props.height ?? minSize });
+
     const [drag, setDrag] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
-
     const [resize, setResize] = useState(false);
-    const [size, setSize] = useState({ width: props.width ?? 200, height: props.height ?? 200 });
 
+    const [hover, setHover] = useState(false);
     const thisRef = useRef(null)
 
     useEffect(() => {
@@ -51,10 +50,14 @@ export default function Floating(props) {
 
 
         function handleMouseMove(e) {
-            if (drag) setPos({ x: e.pageX - offset.x, y: e.pageY - offset.y });
+            if (drag) {
+                const x = Math.min(Math.max(e.pageX - offset.x, 0), window.innerWidth - thisRef.current.getBoundingClientRect().width);
+                const y = Math.min(Math.max(e.pageY - offset.y, 0), window.innerHeight - thisRef.current.getBoundingClientRect().height);
+                setPos({ x, y });
+            }
             if (resize) {
-                const newWidth = Math.max(e.pageX - pos.x, 200);
-                const newHeight = Math.max(e.pageY - pos.y, 200);
+                const newWidth = Math.max(e.pageX - pos.x, minSize);
+                const newHeight = Math.max(e.pageY - pos.y, minSize);
                 setSize({ width: newWidth, height: newHeight });
             };
         }
@@ -93,50 +96,101 @@ export default function Floating(props) {
     let component = createElement(props.component, { size: { width: size.width, height: size.height - 25 } });
 
     return (
-        <FloatingContainer className="floating" style={{ left: pos.x, top: pos.y, width: size.width, height: size.height, display: uistate.profile ? 'none' : 'block'}}
-            color={props.colors[0]} ref={thisRef}>
+        <>
+            {props.subtext && hover && <FloatingSubtext text={props.subtext} color={props.colors[0]} />}
+            <FloatingContainer className="floating" style={{ left: pos.x, top: pos.y, width: size.width, height: size.height, display: uistate.profile ? 'none' : 'block' }}
+                color={props.colors[0]} ref={thisRef}>
 
-            <FloatingHeader
-                background={props.colors[0]}
-                color={props.colors[1]}
-                onMouseDown={handleMouseDown}
-                onMouseUp={() => setDrag(false)} >
-                {props.title}
+                <FloatingHeader
+                    background={props.colors[0]}
+                    color={props.colors[1]}
+                    onMouseEnter={() => setHover(true)}
+                    onMouseLeave={() => setHover(false)}
+                    onMouseDown={handleMouseDown}
+                    onMouseUp={() => setDrag(false)} >
+                    {props.title}
 
-                {props.toggle &&
-                    <FloatingToggles name={props.toggle}/>   
-                }
-            </FloatingHeader>
+                    {props.toggle &&
+                        <FloatingToggles name={props.toggle} color={props.colors[0]} color2={props.colors[1]} />
+                    }
+                </FloatingHeader>
 
-            {component}
+                {component}
 
-            <FloatingResize
-                color={props.colors[0]}
-                onMouseDown={startResize}
-                onMouseUp={() => setResize(false)} />
-        </FloatingContainer>
+                <FloatingResize
+                    color={props.colors[0]}
+                    onMouseDown={startResize}
+                    onMouseUp={() => setResize(false)} />
+            </FloatingContainer>
+        </>
     );
 }
 
 function FloatingToggles(props) {
     const [uistate, setUIState] = useRecoilState(uiStateAtom)
-    const [state,setState] = useState(1);
+    const [dataState, setDataState] = useState(true);
+    const [videoState, setVideoState] = useState(true);
 
-    useEffect(()=>{
-        setUIState({...uistate,[props.name]:state})
-    },[state])
+    useEffect(() => {
+        let stateNum = -1
+        if (dataState && videoState) stateNum = 1
+        else if (dataState && !videoState) stateNum = 2
+        else if (!dataState && videoState) stateNum = 3
+        setUIState({ ...uistate, [props.name]: stateNum })
+    }, [videoState, dataState])
 
+    const states = { 1: 'DATA & VIDEO', 2: 'DATA', 3: 'VIDEO' };
 
-    function click() {
-        setState(((state+1) % 3) + 1);
-    }
-
-    const states = {1:'DATA & VIDEO', 2:'DATA', 3:'VIDEO'};
+    const activeStyle = { background: props.color2, color: props.color }
+    const inactiveStyle = { color: props.color2 }
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.2em', fontSize: '0.5em', marginRight: '0.4em', cursor: 'pointer' }}
-            onClick={click}>
-            {states[state]}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.2em', fontSize: '0.5em', marginRight: '0.4em' }}>
+            <div style={dataState ? activeStyle : inactiveStyle} onClick={() => setDataState(!dataState)}>
+                DATA
+            </div>
+
+            <div style={videoState ? activeStyle : inactiveStyle} onClick={() => setVideoState(!videoState)}>
+                VIDEO
+            </div>
+        </div>
+    )
+}
+
+function FloatingSubtext(props) {
+    const [show, setShow] = useState(false);
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+    useEffect(() => {
+        window.addEventListener("mousemove", handleMouseMove);
+
+        function handleMouseMove(e) {
+            setMousePos({ x: e.pageX, y: e.pageY });
+        }
+
+        return () => {
+            window.removeEventListener("mousemove", handleMouseMove);
+        }
+    }, []);
+
+    useEffect(()=>{
+        setShow(false)
+        const timeout = setTimeout(()=>setShow(true), 500)
+        return ()=>clearTimeout(timeout)
+    }, [mousePos])
+
+    if (!show) return null
+
+    return (
+        <div style={{
+            position: 'absolute',
+            top: mousePos.y - 40,
+            left: mousePos.x - 100,
+            color: props.color,
+            textShadow: '0 0 10px ' + props.color,
+            textAlign: 'center',
+        }}>
+            {props.text}
         </div>
     )
 }

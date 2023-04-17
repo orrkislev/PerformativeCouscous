@@ -1,41 +1,38 @@
-import { getDownloadURL } from 'firebase/storage';
-import { useEffect, useRef, useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { storageRef } from '../utils/useFirebase';
-import { layersDataAtom, performanceAtom } from './Layers';
+import { useRecoilState } from 'recoil';
+import { TimelineBar, TimelineClickContainer, TimelineContainer } from './layers/TimeLine';
+import { audioAtom } from './Audio';
 import { uiStateAtom } from './UI';
+import { SideBarButton } from './UIElements';
+import { useRef } from 'react';
 
 export default function Story(props) {
-    const performance = useRecoilValue(performanceAtom);
-    const layersData = useRecoilValue(layersDataAtom);
-    const uistate = useRecoilValue(uiStateAtom);
-    const [src, setsrc] = useState(null);
-    const ref = useRef(null);
+    const [audioData, setaudioData] = useRecoilState(audioAtom);
+    const [uistate, setuistate] = useRecoilState(uiStateAtom)
+    const ref = useRef(null)
 
-
-    useEffect(() => {
-        getDownloadURL(storageRef(`${performance.name}-story`)).then((url) => {
-            setsrc(url);
-        })
-    }, [performance])
-
-    useEffect(() => {
-        if (ref.current && src) {
-            ref.current.src = src;
-        }
-    }, [src])
-
-    useEffect(() => {
-        if (uistate.story) ref.current.play();
-        else ref.current.pause();
-    }, [uistate.story])
-
-    useEffect(() => {
-        if (Math.abs(ref.current.currentTime - layersData.time) > 1) ref.current.currentTime = layersData.time
-    }, [layersData.time])
-
+    const click = (e) => {
+        const x = e.clientX - ref.current.getBoundingClientRect().left;
+        const perc = x / ref.current.getBoundingClientRect().width;
+        setaudioData({ ...audioData, setPerc: perc });
+    }
 
     return (
-        <audio hidden ref={ref} />
+        <div style={{ display: 'flex' }}>
+            <SideBarButton
+                text='STORY'
+                func={() => setuistate({ ...uistate, story: !uistate.story })}
+                active={uistate.story}
+                colors={['#00ff00', 'black']}
+            />
+            {uistate.story &&
+                <TimelineClickContainer onClick={click} bottom='2em' ref={ref}>
+                    <TimelineContainer>
+                        <TimelineBar style={{ width: `${audioData.perc}%` }} color='#00ff00' />
+                    </TimelineContainer>
+                </TimelineClickContainer>
+            }
+        </div>
     )
 }
+
+

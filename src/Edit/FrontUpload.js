@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { FileUploader } from "react-drag-drop-files";
 import * as faceapi from 'face-api.js';
 import { UploadFile } from "./file";
-import { DataContainer, getPath } from "./Data";
+import { DataContainer } from "./Data";
 import { PoseVis } from "../conponents/layers/Pose";
 import { MindVis } from "../conponents/layers/StateOfMind";
 
@@ -139,7 +139,7 @@ function Pose_calcStuff(poseData) {
         }
     }
     poseStuffData.fillGaps()
-    poseStuffData.lowPassFilter()
+    poseStuffData.lowPassFilter(.1)
     for (let i = 0; i < poseStuffData.data.length; i++) {
         if (poseStuffData.data[i].data) poseData.data[i].data.push(...poseStuffData.data[i].data)
     }

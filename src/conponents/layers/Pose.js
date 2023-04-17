@@ -52,7 +52,7 @@ export function PoseVis(props) {
     return (
         <svg width={`${props.width}px`} height={`${props.height}px`} viewBox={`0 0 ${props.width} ${props.height}`} >
             {paths.map((path, i) => (
-                <polyline key={i} points={path} stroke="red" fill="none" />
+                <polyline key={i} points={path} stroke="red" fill="none" strokeWidth={2} />
             ))}
             {extra}
         </svg>

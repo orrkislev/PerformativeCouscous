@@ -27,12 +27,12 @@ export default function Rhythm(props) {
     }, [performance])
 
     useEffect(() => {
-        if (vidRef.current) {
+        if (vidRef.current && layersData.time) {
             vidRef.current.currentTime = layersData.time;
         }
     }, [layersData.time])
 
-    if (!data) return <div>...</div>
+    if (!data) return null
 
     const showVis = uistate.rhythm != null ? (uistate.rhythm == 1 || uistate.rhythm == 2) : true;
     const showVid = uistate.rhythm != null ? (uistate.rhythm == 1 || uistate.rhythm == 3) : true;
@@ -52,18 +52,37 @@ export default function Rhythm(props) {
 }
 
 export function RhythmVis(props) {
-    if (!props.data) return null;
+    const sound = useRef(null)
+    const lastVal = useRef(0);
 
-    const pos1 = imagePosInContainer(props.data.posLeft.x, props.data.posLeft.y, props.width, props.height, 1920, 1080)
-    const pos2 = imagePosInContainer(props.data.posRight.x, props.data.posRight.y, props.width, props.height, 1920, 1080)
-    const r1 = props.data.valLeft * 30
-    const r2 = props.data.valRight * 30
+    let r = 0
+    let pos = { x: 0, y: 0 }
+    // if (!props.data) return null;
+
+    if (props.data) {
+        const pos1 = imagePosInContainer(props.data.posLeft.x, props.data.posLeft.y, props.width, props.height, 1920, 1080)
+        const pos2 = imagePosInContainer(props.data.posRight.x, props.data.posRight.y, props.width, props.height, 1920, 1080)
+        const r1 = Math.abs(props.data.valLeft * 100)
+        const r2 = Math.abs(props.data.valRight * 100)
+
+        r = props.data.valLeft > props.data.valRight ? r1 : r2;
+        pos = props.data.valLeft > props.data.valRight ? pos1 : pos2;
+
+        if (lastVal.current % 4 > 3 && r % 4 < 1) {
+            if (sound.current) sound.current.play()
+        }
+        lastVal.current = r;
+    }
 
     return (
-        <svg width={`${props.width}px`} height={`${props.height}px`} viewBox={`0 0 ${props.width} ${props.height}`} >
-            <circle cx={pos1.x} cy={pos1.y} r={r1} fill="blue" />
-            <circle cx={pos2.x} cy={pos2.y} r={r2} fill="blue" />
-        </svg>
+        <>
+            <svg width={`${props.width}px`} height={`${props.height}px`} viewBox={`0 0 ${props.width} ${props.height}`} >
+                <circle cx={pos.x} cy={pos.y} r={r} fill="blue" />
+                {/* <circle cx={pos1.x} cy={pos1.y} r={r1} fill="blue" /> */}
+                {/* <circle cx={pos2.x} cy={pos2.y} r={r2} fill="blue" /> */}
+            </svg>
+            <audio hidden src="shaker.wav" ref={sound} />
+        </>
     )
 }
 

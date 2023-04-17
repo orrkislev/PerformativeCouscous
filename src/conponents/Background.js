@@ -12,7 +12,6 @@ export default function Background(props) {
     const [src, setsrc] = useState(null);
     const vidRef = useRef(null);
 
-
     useEffect(()=>{
         getDownloadURL(storageRef(`${performance.name}-front`)).then((url) => {
             setsrc(url);
@@ -27,9 +26,10 @@ export default function Background(props) {
 
 
     if (!uistate.background) return null
+    if (!src) return null
 
     return (
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'gray', zIndex: -1 }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
             <video style={{ width: '100%', height: '100%', objectFit: 'cover' }} ref={vidRef} >
                 <source src={src} type="video/mp4" />
             </video>

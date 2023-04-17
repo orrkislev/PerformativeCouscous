@@ -32,10 +32,11 @@ export default function Gesture(props) {
         }
     }, [layersData.time])
 
-    if (!data) return <div>...</div>
+    if (!data) return null
 
     const showVis = uistate.gesture != null ? (uistate.gesture == 1 || uistate.gesture == 2) : true;
     const showVid = uistate.gesture != null ? (uistate.gesture == 1 || uistate.gesture == 3) : true;
+
 
     return (
         <>  

@@ -67,7 +67,7 @@ export default function StateOfMind(props) {
         }
     }, [layersData.time])
 
-    if (!data) return <div>...</div>
+    if (!data) return null
 
     const frameData = data.setTime(layersData.time).get()
     if (!frameData) return null
