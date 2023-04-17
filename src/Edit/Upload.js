@@ -106,6 +106,9 @@ export default function Upload() {
                         <InputWithLabel>
                             Learned from:<input type="text" value={form.get('learned') ?? ''} name="learned" onChange={form.handleChange} />
                         </InputWithLabel>
+                        <InputWithLabel>
+                            Description:<textarea rows="4" cols="50" value={form.get('description') ?? ''} name="description" onChange={form.handleChange} />
+                        </InputWithLabel>
                     </div>
 
                     <button onClick={savePerformer}>Submit</button>
