@@ -16,11 +16,9 @@ const StateOfMindContainer = styled.div`
 `;
 const StateOfMindText = styled.div`
     position: absolute;
-    bottom: 1em;
-    left: 1em;
     font-size: 0.7rem;
     width: 100%;
-    text-shadow: 0 0 10px yellow;
+    background: rgba(0,0,0,0.3);
 `;
 
 
@@ -107,7 +105,7 @@ export default function StateOfMind(props) {
                     </video>
                 </div>
             }
-            {showVis && <MindVis satisfaction={satisfactionData} focus={expressions.focus} height={150} />}
+            {showVis && <MindVis satisfaction={satisfactionData} focus={expressions.focus} height={props.size.height} width={props.size.width} />}
         </>
     )
 }
@@ -117,48 +115,32 @@ export default function StateOfMind(props) {
 export function MindVis(props) {
     if (!props.satisfaction) return null;
 
-    let path = null
-    // if (props.satisfaction)
-    //     path = props.satisfaction.map((d, i) => {
-    //         const x = i * 10;
-    //         const y = 15 + d * 10;
-    //         return `${i === 0 ? `M ${x} ${y}` : `T ${x} ${y}`}`
-    //     }).join(' ');
 
     const satisfaction = props.satisfaction[props.satisfaction.length - 1] ?? 0
     const satisfactionNum = Math.round(satisfaction * 20)
     const satisfactionDashArray = `${satisfactionNum},${20 - satisfactionNum}`
 
-    const focus = props.focus ?? 0
+    const size = Math.min(props.height, props.width) * .8
 
     return (
         <StateOfMindContainer>
-            <svg width={`150px`} height={`150px`} viewBox={`0 0 150 150`}>
-                <circle cx={75} cy={75} r={50} stroke='yellow' fill="#FFFF0088" strokeDasharray={satisfactionDashArray} strokeLinecap="round" strokeWidth="4" />
-                <circle cx={75} cy={75} r={45 * props.focus} fill='yellow' />
+            <svg width={size + `px`} height={size + `px`} viewBox={`0 0 ${size} ${size}`}>
+                <circle cx={size / 2} cy={size / 2} r={size / 3} stroke='yellow' fill="#FFFF0088" strokeDasharray={satisfactionDashArray} strokeLinecap="round" strokeWidth="4" />
+                <circle cx={size / 2} cy={size / 2} r={size * .3 * props.focus} fill='yellow' />
             </svg>
 
-            {/* {path && ( */}
-            {/*  <div> */}
-            {/* satisfaction: */}
-            {/* <svg width="100%" height="100%" viewBox="0 0 100 50"> */}
-            {/* <path d={path} stroke="yellow" fill="none" /> */}
-            {/* </svg> */}
-            {/* </div> */}
-            {/* )} */}
-            {/* {props.focus && ( */}
-            {/* <div> */}
-            {/* focus: */}
-            {/* <svg width={`${props.height * 2}px`} height={`${props.height}px`} viewBox={`0 0 ${props.height * 2} ${props.height}`}>
-                        <circle cx={100} cy={100} r={props.height * .2} stroke='yellow' fill="#FFFF0088" />
-                        {props.focus && <circle cx={100} cy={100} r={props.height * .18 * props.focus} fill='yellow' />}
-                    </svg> */}
-            {/* </div> */}
-            {/* )} */}
-            <StateOfMindText>
+            <StateOfMindText style={{ top: size / 2, left: props.width / 2 + size / 2 }}>
                 Focus: {Math.round(props.focus * 100)}%<br />
                 Satisfaction: {Math.round(satisfaction * 100)}%
             </StateOfMindText>
+
+            {/* svg of a yellow heart, size is connected to satisfaction */}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={20 + satisfaction * 40} height={20 + satisfaction * 40} 
+                style={{position:'absolute', right:25, bottom:25, transform:'translate(50%,50%)'}}>
+                <path fill="#FFD700" d="M12 21.35l-1.45-1.32C4.72 14.16 2 11.08 2 7.5 2 4.42 4.42 2 7.5 2c2.34 0 4.48 1.19 5.74 3.01A4.988 4.988 0 0 1 16.5 2c3.08 0 5.5 2.42 5.5 5.5 0 3.58-2.72 6.66-8.55 12.53L12 21.35z" />
+            </svg>
+
+
         </StateOfMindContainer>
     )
 }

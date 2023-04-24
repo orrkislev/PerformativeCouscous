@@ -28,11 +28,14 @@ export class DataContainer {
         return this
     }
     get(lerpVal = 1) {
-        if (!this.lastGet)
-            this.lastGet = this.data[this.index].data
-        else
-            this.lastGet = lerpGeneral(this.lastGet, this.data[this.index].data, lerpVal)
-        return this.lastGet
+        return this.data[this.index].data
+        // if (lerpVal == 1) return this.data[this.index].data
+        
+        // if (!this.lastGet)
+        //     this.lastGet = this.data[this.index].data
+        // else
+        //     this.lastGet = lerpGeneral(this.lastGet, this.data[this.index].data, lerpVal)
+        // return this.lastGet
     }
     fillGaps() {
         const filteredData = this.data.map((d, index) => { return { time: d.time, data: d.data, index } }).filter(d => d.data)

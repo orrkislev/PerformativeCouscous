@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 export const UIContainer = styled.div`
@@ -18,13 +18,13 @@ export const UIContainer = styled.div`
 export const UIRow = styled.div`
     display: flex;    
     `;
-    
+
 export const HeaderElement = styled.div`
     cursor: pointer;
     ${props => props.active && `background: white;`};
     ${props => props.active && `color: black;`};
     `;
-    
+
 export const SideBarElement = styled.div`
     cursor: pointer;
     color: ${props => props.color};
@@ -36,6 +36,26 @@ export const SideBarElement = styled.div`
 
 export function SideBarButton(props) {
     const [hover, setHover] = useState(false);
+    const [tooltip, setTooltip] = useState(false);
+
+    useEffect(() => {
+        let timeout
+        if (hover) {
+            const setTooltipTimeout = () => {
+                clearTimeout(timeout)
+                timeout = setTimeout(() => { setTooltip(true) }, 500);
+            }
+            window.addEventListener('mousemove', setTooltipTimeout)
+
+            return () => {
+                window.removeEventListener('mousemove', setTooltipTimeout)
+                clearInterval(timeout)
+            }
+        } else {
+            clearInterval(timeout)
+            setTooltip(false)
+        }
+    }, [hover])
 
     let extra = null
     if (props.withClose) extra = (
@@ -58,6 +78,21 @@ export function SideBarButton(props) {
 
             </SideBarElement>
 
+            {props.tooltip && tooltip &&
+                <div style={{ position: 'relative', flex: 1 }}>
+                    <div style={{
+                        position: 'absolute',
+                        background: 'rgba(0,0,0,0.3)',
+                        color: props.colors[0],
+                        padding: '0.5em',
+                        fontSize: '0.7rem',
+                        border: '1px solid ' + props.colors[0],
+                    }}>
+                        {props.tooltip}
+                    </div>
+                </div>
+            }
+
             {extra}
         </UIRow>
     );
@@ -66,7 +101,7 @@ export function SideBarButton(props) {
 export function ToggleButton(props) {
     const markStyle = { backgroundColor: 'white', color: 'black' }
     return (
-        <div onClick={props.func} style={{background:'black'}}>
+        <div onClick={props.func} style={{ background: 'black' }}>
             {props.text + " "}
             <span style={props.active ? markStyle : {}}>ON</span>/<span style={props.active ? {} : markStyle}>OFF</span>
         </div>

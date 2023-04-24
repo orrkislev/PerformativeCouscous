@@ -1,8 +1,9 @@
 import * as tf from "@tensorflow/tfjs"
 import * as poseDetection from "@tensorflow-models/pose-detection"
+import '@tensorflow/tfjs-backend-webgl';
 import { useRef } from "react"
 
-export default function usePosenet(props) {
+export default function usePosenet(modelName = 'MoveNet') {
     const detector = useRef(null)
     const pose = useRef(null)
     const width = useRef(null)
@@ -13,8 +14,13 @@ export default function usePosenet(props) {
         if (detector.current) return
         width.current = w
         height.current = h
-        const model = poseDetection.SupportedModels.MoveNet;
-        detector.current = await poseDetection.createDetector(model);
+        let model = poseDetection.SupportedModels.MoveNet;
+        let config = {}
+        if (modelName == 'BlazePose') {
+            model = poseDetection.SupportedModels.BlazePose;
+            config = { runtime: 'tfjs', enableSmoothing: true, modelType: 'full' }
+        }
+        detector.current = await poseDetection.createDetector(model, config)
     }
 
     const detect = async (video) => {
@@ -38,7 +44,7 @@ export default function usePosenet(props) {
             part.x = part.x / width.current
             part.y = part.y / height.current
         }
-        return {x:part.x, y:part.y}
+        return { x: part.x, y: part.y }
     }
 
     const getMovement = (partName) => {
@@ -49,11 +55,14 @@ export default function usePosenet(props) {
         const lastPart = lastPos.current.keypoints.find(k => k.name === partName)
         const x2 = lastPart.x * width.current
         const y2 = lastPart.y * height.current
-        const movement = Math.sqrt((x1-x2)**2 + (y1-y2)**2)
+        const movement = Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
         return movement
+    }
+    const getAll_xy = () => {
+        return pose.current.keypoints.map(k=>({x:k.x,y:k.y}))
     }
 
     return {
-        init, detect, getPart, getMovement,
+        init, detect, getPart, getMovement, getAll_xy
     }
 }

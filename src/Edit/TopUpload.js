@@ -72,7 +72,7 @@ export default function TopUpload(props) {
         <div style={{ display: 'flex' }}>
             <video ref={vidRef} height={file ? '150px' : '0px'} />
             {!file && <FileUploader handleChange={selectFile} name="file" label="סרטון מהמצלמה מלמעלה" />}
-            <HandsVis data={handsData} height={150} />
+            <HandsVis data={handsData} height={150} width={200} />
 
             {ready && (
                 <div>

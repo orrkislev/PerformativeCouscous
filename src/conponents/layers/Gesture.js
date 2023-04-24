@@ -57,7 +57,6 @@ export default function Gesture(props) {
 
 export function HandsVis(props) {
     if (!props.data) return null;
-
     const paths = []
     if (props.data.left) paths.push(...getHandPaths(props.data.left, props.width, props.height))
     if (props.data.right) paths.push(...getHandPaths(props.data.right, props.width, props.height))
@@ -77,7 +76,6 @@ function getHandPaths(data, width, height) {
     const newData = data.map(pos => {
         return imagePosInContainer(pos.x, pos.y, width, height, 1920, 1080)
     })
-
 
     return [
         getPath(newData, [0, 1, 2, 3, 4]),

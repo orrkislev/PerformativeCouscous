@@ -116,6 +116,9 @@ function RhythmSound(props) {
 export function RhythmVis(props) {
     if (!props.data) return null;
 
+    if (!props.data.posLeft || !props.data.posRight) return null;
+    if (!props.data.valLeft || !props.data.valRight) return null;
+
     const pos1 = imagePosInContainer(props.data.posLeft.x, props.data.posLeft.y, props.width, props.height, 1920, 1080)
     const pos2 = imagePosInContainer(props.data.posRight.x, props.data.posRight.y, props.width, props.height, 1920, 1080)
     const r1 = props.data.valLeft

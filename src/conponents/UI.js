@@ -37,6 +37,7 @@ function SideBarPerformance(props) {
                         text={layer.text}
                         colors={layer.colors}
                         active={uistate[layer.name]}
+                        tooltip={layer.subtext}
                         func={() => setuistate({ ...uistate, [layer.name]: !uistate[layer.name] })} />
                 )
             })}

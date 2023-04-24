@@ -97,7 +97,6 @@ export default function Floating(props) {
 
     return (
         <>
-            {props.subtext && hover && <FloatingSubtext text={props.subtext} color={props.colors[0]} />}
             <FloatingContainer className="floating" style={{ left: pos.x, top: pos.y, width: size.width, height: size.height, display: uistate.profile ? 'none' : 'block' }}
                 color={props.colors[0]} ref={thisRef}>
 
@@ -128,16 +127,13 @@ export default function Floating(props) {
 
 function FloatingToggles(props) {
     const [uistate, setUIState] = useRecoilState(uiStateAtom)
-    const [dataState, setDataState] = useState(true);
-    const [videoState, setVideoState] = useState(true);
+    const [toggleState, setToggleState] = useState(1)
 
-    useEffect(() => {
-        let stateNum = -1
-        if (dataState && videoState) stateNum = 1
-        else if (dataState && !videoState) stateNum = 2
-        else if (!dataState && videoState) stateNum = 3
-        setUIState({ ...uistate, [props.name]: stateNum })
-    }, [videoState, dataState])
+    function toggle() {
+        const newToggleState = (toggleState + 1) % 3 + 1
+        setToggleState(newToggleState)
+        setUIState({ ...uistate, [props.name]: newToggleState })
+    }
 
     const states = { 1: 'DATA & VIDEO', 2: 'DATA', 3: 'VIDEO' };
 
@@ -145,52 +141,14 @@ function FloatingToggles(props) {
     const inactiveStyle = { color: props.color2 }
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.2em', fontSize: '0.5em', marginRight: '0.4em' }}>
-            <div style={dataState ? activeStyle : inactiveStyle} onClick={() => setDataState(!dataState)}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.2em', fontSize: '0.5em', marginRight: '0.4em' }} onClick={toggle}>
+            <div style={toggleState == 1 || toggleState == 2 ? activeStyle : inactiveStyle} >
                 DATA
             </div>
-
-            <div style={videoState ? activeStyle : inactiveStyle} onClick={() => setVideoState(!videoState)}>
+            /
+            <div style={toggleState == 1 || toggleState == 3 ? activeStyle : inactiveStyle}>
                 VIDEO
             </div>
-        </div>
-    )
-}
-
-function FloatingSubtext(props) {
-    const [show, setShow] = useState(false);
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-    useEffect(() => {
-        window.addEventListener("mousemove", handleMouseMove);
-
-        function handleMouseMove(e) {
-            setMousePos({ x: e.pageX, y: e.pageY });
-        }
-
-        return () => {
-            window.removeEventListener("mousemove", handleMouseMove);
-        }
-    }, []);
-
-    useEffect(()=>{
-        setShow(false)
-        const timeout = setTimeout(()=>setShow(true), 500)
-        return ()=>clearTimeout(timeout)
-    }, [mousePos])
-
-    if (!show) return null
-
-    return (
-        <div style={{
-            position: 'absolute',
-            top: mousePos.y - 40,
-            left: mousePos.x - 100,
-            color: props.color,
-            textShadow: '0 0 10px ' + props.color,
-            textAlign: 'center',
-        }}>
-            {props.text}
         </div>
     )
 }

@@ -18,33 +18,6 @@ export default function BackUpload(props) {
     const opFlow = useRef(null);
     const [rhythmData, setRhythmData] = useState(null);
 
-    const onPoseResult = (results) => {
-        let rhythmVals = null
-        if (results.poseLandmarks) {
-            const posRight = results.poseLandmarks[23]
-            const posLeft = results.poseLandmarks[24]
-            if (!lastPos.current) {
-                lastPos.current = { posRight, posLeft }
-            } else {
-                let valRight = Math.sqrt((posRight.x - lastPos.current.posRight.x) ** 2 + (posRight.y - lastPos.current.posRight.y) ** 2)
-                let valLeft = Math.sqrt((posLeft.x - lastPos.current.posLeft.x) ** 2 + (posLeft.y - lastPos.current.posLeft.y) ** 2)
-                valRight = Math.min(valRight, 0.01)
-                valLeft = Math.min(valLeft, 0.01)
-                lastPos.current = { posRight, posLeft }
-                rhythmVals = { valLeft, valRight, posRight, posLeft }
-            }
-            // rhythmVals = {
-            // valRight: opFlow.current.getFlow(posRight.x, posRight.y, 0.1),
-            // valLeft: opFlow.current.getFlow(posLeft.x, posLeft.y, 0.1),
-            // posRight, posLeft
-            // }
-        } else {
-            lastPos.current = null
-        }
-        allRhythmData.current.insert(rhythmVals, vidRef.current.currentTime);
-        setRhythmData(rhythmVals)
-    };
-
     const selectFile = (videoFile) => {
         setFile(videoFile)
         const smallVid = vidRef.current;
@@ -60,13 +33,7 @@ export default function BackUpload(props) {
         fullVid.width = fullVid.videoWidth;
         fullVid.height = fullVid.videoHeight;
 
-        // const pose = new Holistic({ locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}` });
-        // pose.onResults(onPoseResult);
-        // opFlow.current = new OpticalFlow(video);
-
         const nextFrameCalc = async () => {
-            // opFlow.current.update()
-            // await pose.send({ image: video })
             await posenet.detect(fullVid)
 
             let newVals = null
@@ -85,11 +52,9 @@ export default function BackUpload(props) {
             if (smallVid.currentTime >= smallVid.duration) {
                 smallVid.currentTime = 0;
                 setReady(true);
-                // pose.close();
                 allRhythmData.current.fillGaps();
                 allRhythmData.current.resizer('valRight', 5, 40)
                 allRhythmData.current.resizer('valLeft', 5, 40)
-                // allRhythmData.current.lowPassFilter(.2)
                 smallVid.requestVideoFrameCallback(nextFrameDisplay);
             } else smallVid.requestVideoFrameCallback(nextFrameCalc);
         }

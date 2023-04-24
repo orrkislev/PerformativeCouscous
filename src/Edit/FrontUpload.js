@@ -1,16 +1,19 @@
-import { Holistic } from "@mediapipe/holistic";
 import { useRef, useState } from 'react';
 import { FileUploader } from "react-drag-drop-files";
-import * as faceapi from 'face-api.js';
+// import * as faceapi from 'face-api.js';
+import * as faceapi from '@vladmandic/face-api';
 import { UploadFile } from "./file";
 import { DataContainer } from "./Data";
 import { PoseVis } from "../conponents/layers/Pose";
 import { MindVis } from "../conponents/layers/StateOfMind";
+import usePosenet from "../utils/usePosenet";
 
 export default function FrontUpload(props) {
     const [file, setFile] = useState(null);
     const vidRef = useRef(null);
+    const fullVidRef = useRef(null);
     const [ready, setReady] = useState(false);
+    const posenet = usePosenet('BlazePose')
 
     const allPoseData = useRef(new DataContainer());
     const allExpressionData = useRef(new DataContainer());
@@ -19,84 +22,112 @@ export default function FrontUpload(props) {
     const [poseData, setPoseData] = useState(null);
     const [expressionData, setExpressionData] = useState(null);
 
-    const onPoseResult = (results) => {
-        let positions = null
-        if (results.poseLandmarks) {
-            const headPos = results.poseLandmarks[0];
-            const shoulder1 = results.poseLandmarks[12];
-            const shoulder2 = results.poseLandmarks[11];
-            const top = headPos.y - (shoulder1.y - headPos.y);
-            const left = Math.min(shoulder1.x, shoulder2.x);
-            const width = Math.abs(shoulder1.x - shoulder2.x);
-            const height = Math.abs(shoulder1.y - top);
-            allFaceData.current.insert({ top, left, width, height }, vidRef.current.currentTime);
-
-            positions = results.poseLandmarks.map(landmark => {
-                return { x: landmark.x * vidRef.current.videoWidth, y: landmark.y * vidRef.current.videoHeight }
-            })
-            const bottom = positions.reduce((a, b) => a.y < b.y ? a : b).y;
-            positions.forEach(pos => pos.y -= bottom);
-            const center = [23, 24, 12, 11].reduce((a, b) => a + positions[b].x, 0) / 4;
-            positions.forEach(pos => pos.x -= center);
-            const scale = 1 / positions.reduce((a, b) => a.y > b.y ? a : b).y;
-            positions.forEach(pos => {
-                pos.x *= scale;
-                pos.y *= scale;
-            });
-        }
-        allPoseData.current.insert(positions, vidRef.current.currentTime);
-        setPoseData(positions)
-    };
-
     const selectFile = (videoFile) => {
         props.updateFile(URL.createObjectURL(videoFile));
         setFile(videoFile)
-        const video = vidRef.current;
-        video.src = URL.createObjectURL(videoFile);
+        fullVidRef.current.src = URL.createObjectURL(videoFile);
+        vidRef.current.src = URL.createObjectURL(videoFile);
+        vidRef.current.onloadedmetadata = processVideo
+    }
 
-        const holi = new Holistic({ locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}` });
+    const processVideo = () => {
+        const smallVid = vidRef.current;
+        const fullVid = fullVidRef.current;
+        fullVid.width = fullVid.videoWidth;
+        fullVid.height = fullVid.videoHeight;
+
         const faceExpression = new FaceExpressions()
-        holi.onResults(onPoseResult);
 
         const nextFrameCalc = async () => {
-            await holi.send({ image: video })
-            const newExpressions = await faceExpression.predict(video)
+            const newPose = await posenet.detect(fullVid)
+
+            let vals = null
+            if (newPose) {
+                const positions = posenet.getAll_xy()
+                const bottom = positions.reduce((a, b) => a.y < b.y ? a : b).y;
+                positions.forEach(pos => pos.y -= bottom);
+
+                const center = [11, 12, 23, 24].reduce((a, b) => a + positions[b].x, 0) / 4;
+                positions.forEach(pos => pos.x -= center);
+                const scale = 1 / positions.reduce((a, b) => a.y > b.y ? a : b).y;
+                positions.forEach(pos => {
+                    pos.x *= scale;
+                    pos.y *= scale;
+                });
+                vals = { positions }
+
+                const arm_left_1 = posenet.getMovement('left_wrist')
+                const arm_left_2 = posenet.getMovement('left_elbow')
+                const arm_left_3 = posenet.getMovement('left_shoulder')
+                const arm_left = arm_left_1 + arm_left_2 + arm_left_3
+
+                const arm_right_1 = posenet.getMovement('right_wrist')
+                const arm_right_2 = posenet.getMovement('right_elbow')
+                const arm_right_3 = posenet.getMovement('right_shoulder')
+                const arm_right = arm_right_1 + arm_right_2 + arm_right_3
+
+                const leg_left_1 = posenet.getMovement('left_hip')
+                const leg_left_2 = posenet.getMovement('left_knee')
+                const leg_left_3 = posenet.getMovement('left_ankle')
+                const leg_left = leg_left_1 + leg_left_2 + leg_left_3
+
+                const leg_right_1 = posenet.getMovement('right_hip')
+                const leg_right_2 = posenet.getMovement('right_knee')
+                const leg_right_3 = posenet.getMovement('right_ankle')
+                const leg_right = leg_right_1 + leg_right_2 + leg_right_3
+                vals.intensity = { arm_left, arm_right, leg_left, leg_right }
+            }
+            allPoseData.current.insert(vals, smallVid.currentTime);
+            setPoseData(vals)
+
+            if (newPose) {
+                const headPos = posenet.getPart('nose')
+                const shoulder1 = posenet.getPart('left_shoulder')
+                const shoulder2 = posenet.getPart('right_shoulder')
+                const top = headPos.y - (shoulder1.y - headPos.y);
+                const left = Math.min(shoulder1.x, shoulder2.x);
+                const width = Math.abs(shoulder1.x - shoulder2.x);
+                const height = Math.abs(shoulder1.y - top);
+                allFaceData.current.insert({ top, left, width, height }, smallVid.currentTime);
+            }
+
+            const newExpressions = await faceExpression.predict(fullVid)
             allExpressionData.current.insert(newExpressions, vidRef.current.currentTime);
             setExpressionData(newExpressions)
 
-            video.currentTime += 1 / 20;
-            if (video.currentTime >= video.duration) {
-                video.currentTime = 0;
+            smallVid.currentTime += 1 / 20;
+            fullVid.currentTime = smallVid.currentTime;
+            if (smallVid.currentTime >= smallVid.duration) {
+                smallVid.currentTime = 0;
                 setReady(true);
-                holi.close();
                 allPoseData.current.fillGaps();
-                Pose_calcStuff(allPoseData.current)
                 allExpressionData.current.fillGaps();
                 allFaceData.current.fillGaps();
-                video.requestVideoFrameCallback(nextFrameDisplay);
-            } else video.requestVideoFrameCallback(nextFrameCalc);
+                smallVid.requestVideoFrameCallback(nextFrameDisplay);
+            } else smallVid.requestVideoFrameCallback(nextFrameCalc);
         }
 
         const nextFrameDisplay = () => {
-            allPoseData.current.setTime(vidRef.current?.currentTime)
-            allExpressionData.current.setTime(vidRef.current?.currentTime)
+            allPoseData.current.setTime(smallVid.currentTime)
+            allExpressionData.current.setTime(smallVid.currentTime)
             setPoseData(allPoseData.current.get())
             setExpressionData(allExpressionData.current.get())
 
-            video.currentTime += 1 / 20;
-            if (video.currentTime >= video.duration) {
-                video.currentTime = 0;
+            smallVid.currentTime += 1 / 20;
+            if (smallVid.currentTime >= smallVid.duration) {
+                smallVid.currentTime = 0;
             }
-            video.requestVideoFrameCallback(nextFrameDisplay);
+            smallVid.requestVideoFrameCallback(nextFrameDisplay);
         }
 
-        video.requestVideoFrameCallback(nextFrameCalc);
+        smallVid.requestVideoFrameCallback(nextFrameCalc);
     };
 
     return (
         <div>
             <div style={{ display: 'flex' }}>
                 <video ref={vidRef} height={file ? '150px' : '0px'} />
+                <video ref={fullVidRef} hidden />
                 {!file && <FileUploader handleChange={selectFile} name="file" label="סרטון מהמצלמה מקדימה" />}
                 <PoseVis data={poseData} width={150} height={150} />
                 {expressionData && <MindVis focus={expressionData[0].focus} height={150} />}
@@ -123,44 +154,17 @@ export default function FrontUpload(props) {
 
 
 
-function Pose_calcStuff(poseData) {
-    const poseStuffData = new DataContainer();
-    for (let i = 1; i < poseData.data.length; i++) {
-        const d1 = poseData.data[i - 1].data
-        const d2 = poseData.data[i].data
-        if (!d1 || !d2) {
-            poseStuffData.insert(null, i)
-        } else {
-            const arm1Movemenet = dist(d1[12], d1[14]) - dist(d2[12], d2[14]) + dist(d1[14], d1[16]) - dist(d2[14], d2[16])
-            const arm2Movemenet = dist(d1[11], d1[13]) - dist(d2[11], d2[13]) + dist(d1[13], d1[15]) - dist(d2[13], d2[15])
-            const leg1Movemenet = dist(d1[23], d1[25]) - dist(d2[23], d2[25]) + dist(d1[25], d1[27]) - dist(d2[25], d2[27])
-            const leg2Movemenet = dist(d1[24], d1[26]) - dist(d2[24], d2[26]) + dist(d1[26], d1[28]) - dist(d2[26], d2[28])
-            poseStuffData.insert([arm1Movemenet, arm2Movemenet, leg1Movemenet, leg2Movemenet], i)
-        }
-    }
-    poseStuffData.fillGaps()
-    poseStuffData.lowPassFilter(.1)
-    for (let i = 0; i < poseStuffData.data.length; i++) {
-        if (poseStuffData.data[i].data) poseData.data[i].data.push(...poseStuffData.data[i].data)
-    }
-}
-function dist(a, b) {
-    return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2)
-}
-
-
-
-
-
-
-
 // ['angry', 'disgusted', 'fearful', 'happy', 'sad', 'surprised', 'neutral']
 class FaceExpressions {
-    constructor() {
-        faceapi.loadSsdMobilenetv1Model('/models')
-        faceapi.loadFaceExpressionModel('/models')
+    constructor() {        
+        this.initialized = false
+    }
+    async init(){
+        await faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
+        await faceapi.nets.faceExpressionNet.loadFromUri('/models')
     }
     async predict(video) {
+        if (!this.initialized) await this.init()
         if (video.readyState <= 2) return;
         const detections = await faceapi.detectSingleFace(video).withFaceExpressions()
         if (detections?.expressions) {
