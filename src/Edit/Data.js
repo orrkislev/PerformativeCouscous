@@ -2,6 +2,7 @@ export class DataContainer {
     constructor(data = []) {
         this.data = data
         this.index = 1;
+        this.lastGet = null
     }
     insert(data, time) {
         this.data.push({ time, data })
@@ -13,7 +14,7 @@ export class DataContainer {
     }
     setTime(time) {
         if (this.data.length === 0) return this
-        
+
         if (time < this.data[0].time) this.index = 0;
         else if (time > this.data[this.data.length - 1].time) this.index = this.data.length - 1
         else {
@@ -26,8 +27,12 @@ export class DataContainer {
         }
         return this
     }
-    get() {
-        return this.data[this.index].data
+    get(lerpVal = 1) {
+        if (!this.lastGet)
+            this.lastGet = this.data[this.index].data
+        else
+            this.lastGet = lerpGeneral(this.lastGet, this.data[this.index].data, lerpVal)
+        return this.lastGet
     }
     fillGaps() {
         const filteredData = this.data.map((d, index) => { return { time: d.time, data: d.data, index } }).filter(d => d.data)

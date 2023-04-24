@@ -5,6 +5,8 @@ import { DataContainer } from "../../Edit/Data";
 import { storageRef } from "../../utils/useFirebase";
 import { layersDataAtom, performanceAtom } from "../Layers";
 import { uiStateAtom } from "../UI";
+import * as Tone from 'tone'
+
 
 export default function Rhythm(props) {
     const performance = useRecoilValue(performanceAtom);
@@ -37,6 +39,7 @@ export default function Rhythm(props) {
     const showVis = uistate.rhythm != null ? (uistate.rhythm == 1 || uistate.rhythm == 2) : true;
     const showVid = uistate.rhythm != null ? (uistate.rhythm == 1 || uistate.rhythm == 3) : true;
 
+    const newData = data.setTime(layersData.time).get(.3)
     return (
         <>
             {showVid &&
@@ -45,43 +48,85 @@ export default function Rhythm(props) {
                 </video>
             }
             {showVis &&
-                <RhythmVis data={data.setTime(layersData.time).get()} width={props.size.width} height={props.size.height} />
+                <RhythmVis data={newData} width={props.size.width} height={props.size.height} />
             }
+            {/* <RhythmSound data={newData} /> */}
         </>
     )
 }
 
-export function RhythmVis(props) {
-    const sound = useRef(null)
-    const lastVal = useRef(0);
+function RhythmSound(props) {
 
-    let r = 0
-    let pos = { x: 0, y: 0 }
-    // if (!props.data) return null;
+    // make two different tonejs cimbals
+    const synth1 = useRef(new Tone.MetalSynth({
+        frequency: 200,
+        envelope: {
+            attack: 0.1,
+            decay: 0.3,
+            release: 0.1
+        },
+        harmonicity: 5.1,
+        modulationIndex: 32,
+        resonance: 4000,
+        octaves: 1.5
+    }).toDestination());
 
-    if (props.data) {
-        const pos1 = imagePosInContainer(props.data.posLeft.x, props.data.posLeft.y, props.width, props.height, 1920, 1080)
-        const pos2 = imagePosInContainer(props.data.posRight.x, props.data.posRight.y, props.width, props.height, 1920, 1080)
-        const r1 = Math.abs(props.data.valLeft * 100)
-        const r2 = Math.abs(props.data.valRight * 100)
+    const synth2 = useRef(new Tone.MetalSynth({
+        frequency: 200,
+        envelope: {
+            attack: 0.1,
+            decay: 0.3,
+            release: 0.1
+        },
+        harmonicity: 5.1,
+        modulationIndex: 32,
+        resonance: 4000,
+        octaves: 1.5
+    }).toDestination());
+    
+    const playing1 = useRef(false);
+    const playing2 = useRef(false);
 
-        r = props.data.valLeft > props.data.valRight ? r1 : r2;
-        pos = props.data.valLeft > props.data.valRight ? pos1 : pos2;
+    if (!props.data) return null
 
-        if (lastVal.current % 4 > 3 && r % 4 < 1) {
-            if (sound.current) sound.current.play()
-        }
-        lastVal.current = r;
+    const v1 = props.data.valLeft
+    const v2 = props.data.valRight
+
+    if (v1 > 8 && !playing1.current) {
+        playing1.current = true;
+        synth1.current.triggerAttackRelease("16n")
+        setTimeout(() => {
+            playing1.current = false;
+        }, 500)
     }
+    if (v2 > 8 && !playing2.current) {
+        playing2.current = true;
+        synth2.current.triggerAttackRelease("16n")
+        setTimeout(() => {
+            playing2.current = false;
+        }, 500)
+    }
+    synth1.current.volume.value = 30 * (v1 - 5) / 35
+    synth2.current.volume.value = 30 * (v2 - 5) / 35
+
+
+    return null
+}
+
+export function RhythmVis(props) {
+    if (!props.data) return null;
+
+    const pos1 = imagePosInContainer(props.data.posLeft.x, props.data.posLeft.y, props.width, props.height, 1920, 1080)
+    const pos2 = imagePosInContainer(props.data.posRight.x, props.data.posRight.y, props.width, props.height, 1920, 1080)
+    const r1 = props.data.valLeft
+    const r2 = props.data.valRight
 
     return (
         <>
             <svg width={`${props.width}px`} height={`${props.height}px`} viewBox={`0 0 ${props.width} ${props.height}`} >
-                <circle cx={pos.x} cy={pos.y} r={r} fill="blue" />
-                {/* <circle cx={pos1.x} cy={pos1.y} r={r1} fill="blue" /> */}
-                {/* <circle cx={pos2.x} cy={pos2.y} r={r2} fill="blue" /> */}
+                <circle cx={pos1.x} cy={pos1.y} r={r1} fill="blue" />
+                <circle cx={pos2.x} cy={pos2.y} r={r2} fill="blue" />
             </svg>
-            <audio hidden src="shaker.wav" ref={sound} />
         </>
     )
 }
