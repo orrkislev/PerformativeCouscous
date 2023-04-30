@@ -13,7 +13,9 @@ export default function Pose(props) {
     useEffect(() => {
         getDownloadURL(storageRef(`${performance.name}-pose`)).then((url) => {
             fetch(url).then((res) => res.json()).then((data) => {
-                setData(new DataContainer(data));
+                const newData = new DataContainer(data)
+                newData.lowPassFilterValue('intensity', .2)
+                setData(newData);
             })
         })
     }, [performance])
@@ -38,7 +40,7 @@ export function PoseVis(props) {
 
     let extra = null
     if (props.data.intensity){
-        const max = Object.entries(props.data.intensity).reduce((a, b) => a[1] > b[1] ? a : b)[1]
+        const max = Object.entries(props.data.intensity).reduce((a, b) => a[1] > b[1] ? a : b)
         if (max[0] == 'arm_left') extra = positions[11]
         else if (max[0] == 'arm_right') extra = positions[12]
         else if (max[0] == 'leg_left') extra = positions[23]

@@ -26,6 +26,7 @@ export const HeaderElement = styled.div`
     `;
 
 export const SideBarElement = styled.div`
+position: relative;
     cursor: pointer;
     color: ${props => props.color};
     padding: 0.2em 0;
@@ -64,6 +65,27 @@ export function SideBarButton(props) {
         </div>
     )
 
+    const tooltipStyle = {
+        position: 'absolute',
+        background: props.colors[0],
+        color: props.colors[1],
+        padding: '0.5em',
+        fontSize: '0.7rem',
+        border: '1px solid ' + props.colors[0],
+        left: 'calc(100% + 1em)',
+        top: '0px',
+        width: 'max-content',
+    }
+    if (props.tooltipPos === 'top1') {
+        tooltipStyle.top = 'unset'
+        tooltipStyle.bottom = 'calc(100% + 1em)'
+        tooltipStyle.left = '0px'
+    } else if (props.tooltipPos === 'top2') {
+        tooltipStyle.top = 'unset'
+        tooltipStyle.bottom = 'calc(200% + 1em)'
+        tooltipStyle.left = '0px'
+    }
+
     return (
         <UIRow>
             <SideBarElement
@@ -76,22 +98,15 @@ export function SideBarButton(props) {
 
                 {props.text}
 
-            </SideBarElement>
-
-            {props.tooltip && tooltip &&
-                <div style={{ position: 'relative', flex: 1 }}>
-                    <div style={{
-                        position: 'absolute',
-                        background: 'rgba(0,0,0,0.3)',
-                        color: props.colors[0],
-                        padding: '0.5em',
-                        fontSize: '0.7rem',
-                        border: '1px solid ' + props.colors[0],
-                    }}>
+                {props.tooltip && tooltip && 
+                    <div style={tooltipStyle}>
                         {props.tooltip}
                     </div>
-                </div>
-            }
+                }
+
+            </SideBarElement>
+
+
 
             {extra}
         </UIRow>

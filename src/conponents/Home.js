@@ -40,11 +40,13 @@ const HomeCardDiv = styled.div`
     transition: background 0.1s;
     `;
 const HomeCardTitle = styled.h1`
-    font-size: 3em;
+    margin: 0;
+    font-size: 4em;
     color: black;
     `;
 const HomeCardDescription = styled.p`
     font-size: 1em;
+    font-weight: 600;
     color: black;
     `;
 

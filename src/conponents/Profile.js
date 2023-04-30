@@ -31,7 +31,7 @@ export default function Profile(props) {
 
     return (
         <Centered wide>
-            <h1>PERFORMER DATA</h1>
+            <div></div>
             <div style={{display:'flex',gap:'1em'}}>
                 <ProfilePart>
                     <ProfilePartTitle>NAME:</ProfilePartTitle>

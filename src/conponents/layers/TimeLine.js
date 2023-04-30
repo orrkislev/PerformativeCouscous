@@ -47,6 +47,8 @@ export default function Timeline(props) {
                 func={() => setuistate({ ...uistate, timeline: !uistate.timeline })}
                 active={uistate.timeline}
                 colors={['#ffffff', 'black']}
+                tooltip='Show/Hide Timeline'
+                tooltipPos='top1'
             />
             {uistate.timeline &&
                 <TimelineClickContainer onMouseDown={click} bottom='3em' ref={ref}>

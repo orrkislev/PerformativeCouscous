@@ -46,7 +46,7 @@ function HeaderLeft(props) {
                     <HeaderElement active={page.page === 'performance' && !uistate.profile} onClick={() => setuistate({ ...uistate, profile: !uistate.profile })}>{performance.name}</HeaderElement >
                     {uistate.profile && (
                         <>
-                            /<HeaderElement active onClick={() => setuistate({ ...uistate, profile: !uistate.profile })}>Profile</HeaderElement>
+                            /<HeaderElement active onClick={() => setuistate({ ...uistate, profile: !uistate.profile })}>Performer Data</HeaderElement>
                         </>
                     )}
                 </>

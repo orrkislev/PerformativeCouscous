@@ -5,9 +5,7 @@ import Gesture from './layers/Gesture';
 import Pose from './layers/Pose';
 import Rhythm from './layers/Rhythm';
 import StateOfMind from './layers/StateOfMind';
-import Timeline from './layers/TimeLine';
 import { uiStateAtom } from './UI';
-import Story from './Story';
 
 export const layersDataAtom = atom({ key: 'layersData', default: { time: 0, reset: 0 } });
 export const performanceAtom = new atom({ key: 'performance', default: {} });

@@ -23,6 +23,8 @@ export default function Story(props) {
                 func={() => setuistate({ ...uistate, story: !uistate.story })}
                 active={uistate.story}
                 colors={['#00ff00', 'black']}
+                tooltip='Show/Hide Story'
+                tooltipPos='top2'
             />
             {uistate.story &&
                 <TimelineClickContainer onClick={click} bottom='2em' ref={ref}>

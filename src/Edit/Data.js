@@ -62,6 +62,18 @@ export class DataContainer {
             }
         }
     }
+    lowPassFilterValue(val, alpha = .5) {
+        let last = null
+        for (let i = 1; i < this.data.length; i++) {
+            if (this.data[i].data) {
+                if (!last) last = this.data[i].data[val]
+                else {
+                    last = lerpGeneral(last, this.data[i].data[val], alpha)
+                    this.data[i].data[val] = last;
+                }
+            }
+        }
+    }
     resizer(val, newMin, newMax) {
         let minVal = Infinity;
         let maxVal = -Infinity;
