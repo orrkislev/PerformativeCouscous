@@ -10,6 +10,18 @@ export default function Home() {
     const [snapshot, loading, error, reload] = useCollectionOnce(collectionRef('performers'));
     const [page, setPage] = useRecoilState(pageAtom);
 
+    if (loading || error) return null
+    if (!snapshot) return null
+
+    let docs = snapshot.docs.map(doc => doc.data())
+    if (page.subpage === 'age') 
+        docs = docs.sort((a,b) => b.age - a.age)
+    if (page.subpage === 'skill')
+        docs = docs.sort((a,b) => b.proficienty - a.proficienty)
+    if (page.subpage === 'intensity')
+        docs = docs.sort((a,b) => Math.random() - 0.5)
+
+
     return (
         <div style={{
             margin: '10em 6em',
@@ -17,7 +29,7 @@ export default function Home() {
             gridTemplateColumns: '1fr 1fr 1fr',
             gap: '3em',
         }}>
-            {snapshot && snapshot.docs.map((doc,index) => <HomeCard key={index} {...doc.data()} />)}
+            {docs.map((doc,index) => <HomeCard key={index} {...doc} />)}
         </div>
     )
 }
