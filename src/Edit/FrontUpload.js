@@ -162,6 +162,7 @@ class FaceExpressions {
     async init(){
         await faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
         await faceapi.nets.faceExpressionNet.loadFromUri('/models')
+        this.initialized = true
     }
     async predict(video) {
         if (!this.initialized) await this.init()

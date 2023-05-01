@@ -11,21 +11,29 @@ export default function usePosenet(modelName = 'MoveNet') {
     const lastPos = useRef(null)
 
     const init = async (w, h) => {
+        console.log('init')
         if (detector.current) return
+        console.log('init2')
         width.current = w
         height.current = h
         let model = poseDetection.SupportedModels.MoveNet;
         let config = {}
         if (modelName == 'BlazePose') {
             model = poseDetection.SupportedModels.BlazePose;
-            config = { runtime: 'tfjs', enableSmoothing: true, modelType: 'full' }
+            config = { 
+                runtime: 'tfjs', 
+                enableSmoothing: true, 
+                modelType: 'full', 
+             }
         }
         detector.current = await poseDetection.createDetector(model, config)
     }
 
     const detect = async (video) => {
+        console.log('detect1')
         if (!detector.current) await init(video.videoWidth, video.videoHeight)
 
+        console.log('detect2')
         if (pose.current) lastPos.current = pose.current
         const newPose = await detector.current.estimatePoses(video, {
             maxPoses: 1,
