@@ -22,13 +22,18 @@ export default function Audio(props) {
 
     useEffect(() => {
         let interval
-        if (ref.current && src) {
-            ref.current.src = src;
-            ref.current.addEventListener('ended', () => {
+
+        const restartAudio = () => {
+            if (ref.current) {
                 ref.current.currentTime = 0;
                 ref.current.play();
                 ref.current.muted = !uistate.story;
-            })
+            }
+        }
+
+        if (ref.current && src) {
+            ref.current.src = src;
+            ref.current.addEventListener('ended', restartAudio)
             ref.current.play()
 
             interval = setInterval(() => {
@@ -38,10 +43,7 @@ export default function Audio(props) {
         return () => {
             if (ref.current) {
                 ref.current.pause();
-                ref.current.removeEventListener('ended', () => {
-                    ref.current.currentTime = 0;
-                    ref.current.play();
-                })
+                ref.current.removeEventListener('ended', restartAudio)
             }
             clearInterval(interval)
         }

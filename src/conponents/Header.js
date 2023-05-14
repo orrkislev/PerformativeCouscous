@@ -40,13 +40,13 @@ function HeaderLeft(props) {
         <div style={{ display: 'flex', gap: '.5em', background:'black'}}>
             <HeaderElement active={page.page === 'home'} onClick={() => gotoPage({ page: 'home' })}>PERFORMATIVE COUSCOUS</HeaderElement>/
             <HeaderElement active={page.page === 'about'} onClick={() => gotoPage({ page: 'about' })}>ABOUT</HeaderElement>/
-            <HeaderElement active={page.page === 'join'} onClick={() => gotoPage({ page: 'join', subpage: 1 })}>JOIN</HeaderElement>/
+            <HeaderElement active={page.page === 'join'} onClick={() => gotoPage({ page: 'join', subpage: 1 })}>JOIN</HeaderElement>
             {performance && (
                 <>
-                    <HeaderElement active={page.page === 'performance' && !uistate.profile} onClick={() => setuistate({ ...uistate, profile: !uistate.profile })}>{performance.name}</HeaderElement >
+                    /<HeaderElement active={page.page === 'performance' && !uistate.profile} onClick={() => setuistate({ ...uistate, profile: !uistate.profile })}>{performance.name}</HeaderElement >
                     {uistate.profile && (
                         <>
-                            /<HeaderElement active onClick={() => setuistate({ ...uistate, profile: !uistate.profile })}>Performer Data</HeaderElement>
+                            /<HeaderElement active onClick={() => setuistate({ ...uistate, profile: !uistate.profile })}>PERFORMER DATA</HeaderElement>
                         </>
                     )}
                 </>
@@ -66,18 +66,18 @@ function HeaderRight(props) {
 
     if (page.page === 'home') return (
         <div>
-            <span style={{ marginRight: '.5em' }}>View Gallery By:</span>
-            <M button disabled={page.subpage !== 'skill'} onClick={() => setpage({ page: 'home', subpage: 'skill' })}>Skill Level</M> /
-            <M button disabled={page.subpage !== 'age'} onClick={() => setpage({ page: 'home', subpage: 'age' })}>Age</M> /
-            <M button disabled={page.subpage !== 'intensity'} onClick={() => setpage({ page: 'home', subpage: 'intensity' })}>Movement Intensity</M>
+            <span style={{ marginRight: '.5em' }}>VIEW GALLERY BY:</span>
+            <M button disabled={page.subpage !== 'skill'} onClick={() => setpage({ page: 'home', subpage: 'skill' })}>SKILL LEVEL</M> /
+            <M button disabled={page.subpage !== 'age'} onClick={() => setpage({ page: 'home', subpage: 'age' })}>AGE</M> /
+            <M button disabled={page.subpage !== 'intensity'} onClick={() => setpage({ page: 'home', subpage: 'intensity' })}>MOVEMENT INTENSITY</M>
         </div>
     )
 
     if (page.page === 'performance') return (
         <div style={{ display: 'flex', gap: '5em' }}>
-            <ToggleButton text="Background" active={uistate.background} func={() => setuistate({ ...uistate, background: !uistate.background })} />
+            <ToggleButton text="BACKGROUND" active={uistate.background} func={() => setuistate({ ...uistate, background: !uistate.background })} />
             {/* <ToggleButton text="Story" active={uistate.story} func={() => setuistate({ ...uistate, story: !uistate.story })} /> */}
-            <ToggleSmallButton text="Profile" active={uistate.profile} func={() => setuistate({ ...uistate, profile: !uistate.profile })} />
+            <ToggleSmallButton text="PERFORMER DATA" active={uistate.profile} func={() => setuistate({ ...uistate, profile: !uistate.profile })} />
         </div>
     )
 }

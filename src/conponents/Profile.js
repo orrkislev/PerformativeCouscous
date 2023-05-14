@@ -77,8 +77,8 @@ export default function Profile(props) {
                 </ProfilePart>
             </div>
             <div>
-                <p>* Never - Newbie / Rarely - Novice / Special occasions - Intermediate / Monthly - Advanced / Weekly - Expert</p>
-                <p>** How far back does the knowledge of couscous making runs in your family? </p>
+                <p>* Never = Newbie,  Rarely = Novice,  Special occasions = Intermediate,  Monthly = Advanced,  Weekly = Expert</p>
+                <p>** How far back does the knowledge of couscous making run in your family? </p>
             </div>
         </Centered>
     )

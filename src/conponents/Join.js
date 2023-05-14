@@ -58,8 +58,10 @@ export default function Join(props) {
         return (
             <Centered>
                 <div>
-                    <p>thank you for joining the <M>PERFORMATIVE COUSCOUS ARCHIVE.</M></p>
-                    <p>We believe that anyone is a performer and everyone is welcome to join our archive. We will invite you for a short cooking & filming session (or come to you).</p>
+                    <p>Thank you for your interest in the  <M>PERFORMATIVE COUSCOUS ARCHIVE.</M> </p>
+                    <br/>
+                    <p>We believe that anyone is a performer and everyone is welcome to join our archive. It doesn’t matter if you are a pro or a beginner who wants to try making couscous for the first time. </p>
+                    <p>Follow the link to email us, and we will invite you for a short cooking & filming session (or come to you).</p>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div></div>
