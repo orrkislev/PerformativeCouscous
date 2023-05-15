@@ -27,7 +27,6 @@ export default function Audio(props) {
             if (ref.current) {
                 ref.current.currentTime = 0;
                 ref.current.play();
-                ref.current.muted = !uistate.story;
             }
         }
 

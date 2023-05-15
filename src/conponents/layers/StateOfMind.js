@@ -84,11 +84,11 @@ export default function StateOfMind(props) {
             const rescaleX = props.size.width / portraitData.width * 1.5
             const rescaleY = props.size.height / portraitData.height * 1.5
             const rescale = Math.min(rescaleX, rescaleY)
-
+            
             vidData.vidWidth = 1280 * rescale
             vidData.vidHeight = 720 * rescale
-            vidData.vidLeft = rescale * (portraitData.left + portraitData.width / 4)
-            vidData.vidTop = rescale * (portraitData.top - portraitData.height / 2)
+            vidData.vidLeft = rescale * (portraitData.left + portraitData.width / 2) - props.size.width / 2
+            vidData.vidTop = rescale * (portraitData.top + portraitData.height / 2) - props.size.height / 2
         }
     }
 

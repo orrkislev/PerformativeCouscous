@@ -8,8 +8,8 @@ import Timeline from './layers/TimeLine';
 
 export const uiStateAtom = new atom({
     key: 'UIState', default: {
-        gestures: false, pose: true, rhythm: false, mind: false, tools: false, mix: false,
-        background: true, story: false, profile: false
+        gestures: true, pose: true, rhythm: false, mind: false, tools: false, mix: false,
+        background: true, story: true, profile: false
     }
 });
 

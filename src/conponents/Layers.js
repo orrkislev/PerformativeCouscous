@@ -20,8 +20,6 @@ export const layersPerfs = [
         subtext:'The body tempo, originating in the hips, translated to sound' },
     { name: 'mind',      colors: ['#ffff00', 'black'], text: 'STATE OF MIND', component: StateOfMind, toggle: 'mind',
         subtext:'Facial expressions showing levels of focus and satisfaction' },
-    // { name: 'timeline', colors: ['#ffffff', 'black'], text: 'TIMELINE',      component: (<Timeline />), notFloating: true },
-    // { name: 'story',    colors: ['#00ff00', 'black'], text: 'STORY',         component: (<Story />), notFloating: true },
     { name: 'empty',     colors: ['#000000', 'black'], text: '', component: null },
 ]
 
