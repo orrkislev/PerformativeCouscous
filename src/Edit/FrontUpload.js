@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
 import { FileUploader } from "react-drag-drop-files";
-// import * as faceapi from 'face-api.js';
 import * as faceapi from '@vladmandic/face-api';
 import { UploadFile } from "./file";
 import { DataContainer } from "./Data";
@@ -119,8 +118,7 @@ export default function FrontUpload(props) {
             }
             smallVid.requestVideoFrameCallback(nextFrameDisplay);
         }
-
-        smallVid.requestVideoFrameCallback(nextFrameCalc);
+        smallVid.requestVideoFrameCallback(nextFrameCalc)
     };
 
     return (

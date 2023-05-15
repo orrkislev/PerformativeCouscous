@@ -11,6 +11,7 @@ export default function usePosenet(modelName = 'MoveNet') {
     const lastPos = useRef(null)
 
     const init = async (w, h) => {
+        await tf.ready()
         console.log('init')
         if (detector.current) return
         console.log('init2')
@@ -26,6 +27,7 @@ export default function usePosenet(modelName = 'MoveNet') {
                 modelType: 'full', 
              }
         }
+        tf.setBackend('webgl');
         detector.current = await poseDetection.createDetector(model, config)
     }
 
