@@ -47,7 +47,7 @@ export default function Join(props) {
     const [state, setState] = useState(1)
 
     const sendUsEmail = () => {
-        window.open('mailto:orrkislev@gmail.com');
+        window.open('mailto:ayabentur@gmail.com');
 
         setTimeout(() => {
             setState(2)
