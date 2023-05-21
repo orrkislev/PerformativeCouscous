@@ -27,6 +27,10 @@ export default function About() {
                     <br/>
                     <p>We invite you to drag, position, question, listen and play!</p>
 
+                    {/* vimeo video, clean without extra buttons or logos */}
+                    <div style={{marginTop:'3em'}}>
+                        <iframe src="https://player.vimeo.com/video/828642719?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;h=2f2b2a2d1b" width="640" height="360" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Couscous Archive"></iframe>
+                    </div>
                 </div>
             </div>
 
